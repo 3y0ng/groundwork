@@ -19,7 +19,7 @@ const STEPS = [
   { n: 4, title: 'Consolidate & decide', body: 'Weigh the evidence by quality, not headcount, then record a decision: continue, narrow, pivot, or proceed.' },
 ]
 
-export function WelcomeModal({ onClose, onOpenSetup }: { onClose: () => void; onOpenSetup: () => void }) {
+export function WelcomeModal({ onClose, onOpenSetup, onStartFresh }: { onClose: () => void; onOpenSetup: () => void; onStartFresh: () => void }) {
   return (
     <Modal open onClose={onClose} wide title="Welcome to Groundwork" sub="Turn “I think this is a problem” into evidence you can trust.">
       <div className="space-y-4">
@@ -42,15 +42,18 @@ export function WelcomeModal({ onClose, onOpenSetup }: { onClose: () => void; on
 
         <div className="rounded-lg bg-canvas border border-line p-3 text-sm text-ink-soft flex items-start justify-between gap-3">
           <p>
-            You’re on the <strong>keyless demo AI</strong> — everything works offline with sample data.
-            Want real AI on your own key? It takes about a minute to set up.
+            Everything runs offline on a <strong>keyless demo AI</strong>. Want real AI on your own
+            key? It takes about a minute — <button className="text-brand-600 hover:underline font-medium" onClick={() => { onClose(); onOpenSetup() }}>set it up</button>.
           </p>
-          <button className="btn-outline shrink-0 text-xs py-1.5" onClick={() => { onClose(); onOpenSetup() }}>Set up real AI</button>
         </div>
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-line">
-          <button className="btn-primary" onClick={onClose}>Explore the demo</button>
+        <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-line">
+          <button className="btn-outline" onClick={onClose}>Explore the demo</button>
+          <button className="btn-primary" onClick={onStartFresh}>Start my own project →</button>
         </div>
+        <p className="text-xs text-ink-faint text-center -mt-1">
+          Exploring the demo? It’s a worked example with mixed evidence. Starting your own gives you a blank slate.
+        </p>
       </div>
     </Modal>
   )

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/Sidebar'
 import { WelcomeModal, SetupGuide } from '@/components/Onboarding'
 import { useUI, WELCOME_KEY } from '@/store/ui'
+import { useStore } from '@/store/useStore'
 import { Overview } from '@/pages/Overview'
 import { Hypotheses } from '@/pages/Hypotheses'
 import { HypothesisDetail } from '@/pages/HypothesisDetail'
@@ -19,10 +20,18 @@ export default function App() {
     try { return !localStorage.getItem(WELCOME_KEY) } catch { return false }
   })
   const { setupOpen, openSetup, closeSetup } = useUI()
+  const startFresh = useStore(s => s.startFresh)
+  const navigate = useNavigate()
 
   const dismissWelcome = () => {
     try { localStorage.setItem(WELCOME_KEY, '1') } catch { /* ignore */ }
     setWelcome(false)
+  }
+
+  const handleStartFresh = () => {
+    startFresh()
+    dismissWelcome()
+    navigate('/settings')
   }
 
   return (
@@ -45,7 +54,7 @@ export default function App() {
         </div>
       </main>
 
-      {welcome && <WelcomeModal onClose={dismissWelcome} onOpenSetup={openSetup} />}
+      {welcome && <WelcomeModal onClose={dismissWelcome} onOpenSetup={openSetup} onStartFresh={handleStartFresh} />}
       <SetupGuide open={setupOpen} onClose={closeSetup} />
     </div>
   )

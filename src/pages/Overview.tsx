@@ -27,13 +27,18 @@ export function Overview() {
 
   const daysLeft = daysUntil(project?.deadline)
 
+  const nextAction = useMemo(
+    () => computeNextAction(hypotheses, segments, interviews, evidence),
+    [hypotheses, segments, interviews, evidence],
+  )
+
   if (!project) return null
 
   return (
     <div>
       <SectionHeading
-        title={project.name}
-        sub={project.problemStatement}
+        title={project.name || 'Untitled project'}
+        sub={project.problemStatement || 'Add a one-sentence problem statement in Project setup to frame what you are testing.'}
         action={
           <Link to="/settings" className="btn-outline">Project setup</Link>
         }
@@ -55,34 +60,41 @@ export function Overview() {
               <h2 className="font-semibold">Hypotheses & evidence strength</h2>
               <Link to="/hypotheses" className="text-sm text-brand-600 hover:underline">View all</Link>
             </div>
-            <div className="space-y-2.5">
-              {hypotheses.map(h => {
-                const s = scoreEvidence(evidenceForHypothesis(h.id, evidence))
-                const linked = interviews.filter(i => i.hypothesisIds.includes(h.id)).length
-                return (
-                  <Link key={h.id} to={`/hypotheses/${h.id}`} className="block rounded-lg border border-line p-3 hover:bg-black/[0.02] transition-colors">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="font-medium text-sm text-ink truncate">{h.title}</span>
-                      <StatusBadge status={h.status} />
-                    </div>
-                    <div className="flex items-center justify-between gap-4 mt-2">
-                      <EvidenceStrengthMeter strength={s.strength === 'none' ? h.strength : s.strength} />
-                      <span className="text-xs text-ink-faint whitespace-nowrap">{linked} interview{linked === 1 ? '' : 's'}</span>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
+            {hypotheses.length === 0 ? (
+              <div className="text-sm text-ink-soft py-4 text-center">
+                No hypotheses yet. <Link to="/hypotheses" className="text-brand-600 hover:underline">Create your first one</Link> to start turning your belief into something testable.
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {hypotheses.map(h => {
+                  const s = scoreEvidence(evidenceForHypothesis(h.id, evidence))
+                  const linked = interviews.filter(i => i.hypothesisIds.includes(h.id)).length
+                  return (
+                    <Link key={h.id} to={`/hypotheses/${h.id}`} className="block rounded-lg border border-line p-3 hover:bg-black/[0.02] transition-colors">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="font-medium text-sm text-ink truncate">{h.title}</span>
+                        <StatusBadge status={h.status} />
+                      </div>
+                      <div className="flex items-center justify-between gap-4 mt-2">
+                        <EvidenceStrengthMeter strength={s.strength === 'none' ? h.strength : s.strength} />
+                        <span className="text-xs text-ink-faint whitespace-nowrap">{linked} interview{linked === 1 ? '' : 's'}</span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </Card>
 
           <Card className="p-5">
             <h2 className="font-semibold mb-1">Recommended next action</h2>
-            <p className="text-sm text-ink-soft mb-3">Based on where the evidence is thinnest, not on interview count.</p>
-            <Callout tone="info" title="Interview high-volume DTC performance leads about consequences">
-              Frequency is well supported, but only two participants named a real cost of the problem.
-              Narrow to teams shipping 30+ creatives a week and press on what the lost learning actually
-              costs them. Until you see a repeated, sizeable consequence, treat urgency as unproven.
-            </Callout>
+            <p className="text-sm text-ink-soft mb-3">Based on where your validation is thinnest, not on interview count.</p>
+            <Link to={nextAction.to} className="block">
+              <Callout tone="info" title={nextAction.title}>
+                {nextAction.body}
+                <span className="block mt-1.5 font-medium text-brand-700">{nextAction.cta} →</span>
+              </Callout>
+            </Link>
           </Card>
         </div>
 
@@ -125,6 +137,41 @@ export function Overview() {
       </div>
     </div>
   )
+}
+
+// Recommends the single most useful next step for wherever the founder is in the
+// journey — so a brand-new project points at "create a hypothesis", not at
+// consolidation it has no data for.
+function computeNextAction(
+  hypotheses: ReturnType<typeof useProjectData>['hypotheses'],
+  segments: ReturnType<typeof useProjectData>['segments'],
+  interviews: ReturnType<typeof useProjectData>['interviews'],
+  evidence: ReturnType<typeof useProjectData>['evidence'],
+): { title: string; body: string; to: string; cta: string } {
+  if (hypotheses.length === 0)
+    return { title: 'Define your first hypothesis', body: 'Break your problem into a specific, testable claim — and decide up front what would prove it wrong.', to: '/hypotheses', cta: 'Go to Hypotheses' }
+  if (segments.length === 0)
+    return { title: 'Add a customer segment', body: 'Describe the group you think has this problem by observable traits, so you know who to interview.', to: '/segments', cta: 'Go to Customer Segments' }
+  if (interviews.length === 0)
+    return { title: 'Plan and log your first interview', body: 'Generate a guide that digs into real past behaviour, then capture what you heard.', to: '/interviews', cta: 'Go to Interviews' }
+  if (evidence.length === 0)
+    return { title: 'Extract evidence from your interviews', body: 'Turn your notes into classified, quote-backed evidence and tie it to your hypotheses.', to: '/interviews', cta: 'Go to Interviews' }
+
+  // There is data — point at the hypothesis with the thinnest evidence.
+  const ranked = hypotheses
+    .map(h => ({ h, score: scoreEvidence(evidenceForHypothesis(h.id, evidence)) }))
+    .sort((a, b) => rankStrength(a.score.strength) - rankStrength(b.score.strength))
+  const weakest = ranked[0]
+  return {
+    title: `Strengthen "${weakest.h.title}"`,
+    body: 'This hypothesis has the thinnest evidence. Consolidate what you have, then run interviews aimed squarely at the gap.',
+    to: `/hypotheses/${weakest.h.id}`,
+    cta: 'Open hypothesis',
+  }
+}
+
+function rankStrength(s: string): number {
+  return { contradicted: 0, none: 1, weak: 2, mixed: 3, strong: 4 }[s] ?? 1
 }
 
 function Stat({ label, value, sub, tone }: { label: string; value: number | string; sub?: string; tone?: 'support' | 'contra' }) {

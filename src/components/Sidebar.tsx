@@ -39,7 +39,7 @@ export function Sidebar() {
           onChange={e => setActiveProject(e.target.value)}
         >
           {projects.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+            <option key={p.id} value={p.id}>{p.name || 'Untitled project'}</option>
           ))}
         </select>
       </div>

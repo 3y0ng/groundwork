@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, SectionHeading, Field, Callout } from '@/components/ui'
 import { ConfidenceIndicator } from '@/components/widgets'
 import { useActiveProject } from '@/store/hooks'
 import { useStore } from '@/store/useStore'
+import { WELCOME_KEY } from '@/store/ui'
 import { ai } from '@/ai/engine'
 import type { ProblemCritique } from '@/ai/schemas'
 import type { Confidence } from '@/types/domain'
@@ -12,8 +14,10 @@ export function ProjectSettings() {
   const updateProject = useStore(s => s.updateProject)
   const addProject = useStore(s => s.addProject)
   const resetDemo = useStore(s => s.resetDemo)
+  const startFresh = useStore(s => s.startFresh)
   const exportProject = useStore(s => s.exportProject)
   const importProject = useStore(s => s.importProject)
+  const navigate = useNavigate()
 
   const [critique, setCritique] = useState<ProblemCritique | null>(null)
   const [busy, setBusy] = useState(false)
@@ -134,9 +138,21 @@ export function ProjectSettings() {
           </Card>
 
           <Card className="p-5">
-            <h3 className="section-title mb-2">Reset</h3>
-            <p className="text-sm text-ink-soft mb-3">Restore the demo project and sample interviews. Clears anything you've added locally.</p>
-            <button className="btn-outline w-full" onClick={() => { if (confirm('Reset all local data to the demo?')) resetDemo() }}>Reset demo data</button>
+            <h3 className="section-title mb-2">Start over</h3>
+            <div className="flex flex-col gap-2">
+              <button
+                className="btn-outline w-full"
+                onClick={() => { if (confirm('Clear all local data and start with a blank project?')) { startFresh(); navigate('/') } }}
+              >Start a fresh workspace</button>
+              <button
+                className="btn-outline w-full"
+                onClick={() => { try { localStorage.removeItem(WELCOME_KEY) } catch { /* ignore */ } location.reload() }}
+              >Replay the welcome walkthrough</button>
+              <button
+                className="btn-ghost w-full text-ink-faint"
+                onClick={() => { if (confirm('Reset all local data to the demo?')) resetDemo() }}
+              >Reset to demo data</button>
+            </div>
           </Card>
         </div>
       </div>

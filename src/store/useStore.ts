@@ -80,6 +80,7 @@ interface State {
   importProject: (bundle: unknown) => string | null
 
   resetDemo: () => void
+  startFresh: () => string
 }
 
 export const useStore = create<State>()(
@@ -212,6 +213,22 @@ export const useStore = create<State>()(
 
       resetDemo: () =>
         set({ ...seedBundle, evidence: [], templates: [], activeProjectId: seedBundle.projects[0]?.id ?? null }),
+
+      // Clear everything and start with one blank project — the true "brand-new
+      // founder" state. Always leaves ≥1 project so page guards hold.
+      startFresh: () => {
+        const id = uid('proj')
+        const project: Project = {
+          id, name: '', problemStatement: '', solutionIdea: '', industry: '',
+          stage: 'Idea / pre-seed', decisionToMake: '', deadline: '', confidence: 'low',
+          createdAt: nowISO(),
+        }
+        set({
+          projects: [project], hypotheses: [], segments: [], interviews: [],
+          evidence: [], decisions: [], insights: [], templates: [], activeProjectId: id,
+        })
+        return id
+      },
     }),
     {
       name: 'groundwork-store-v1',

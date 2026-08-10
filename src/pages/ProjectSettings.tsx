@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Card, SectionHeading, Field, Callout } from '@/components/ui'
 import { ConfidenceIndicator } from '@/components/widgets'
 import { useActiveProject } from '@/store/hooks'
@@ -12,12 +12,40 @@ export function ProjectSettings() {
   const updateProject = useStore(s => s.updateProject)
   const addProject = useStore(s => s.addProject)
   const resetDemo = useStore(s => s.resetDemo)
+  const exportProject = useStore(s => s.exportProject)
+  const importProject = useStore(s => s.importProject)
 
   const [critique, setCritique] = useState<ProblemCritique | null>(null)
   const [busy, setBusy] = useState(false)
+  const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   if (!project) return null
   const set = (patch: Partial<typeof project>) => updateProject(project.id, patch)
+
+  function handleExport() {
+    const bundle = exportProject(project!.id)
+    const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const slug = project!.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'project'
+    a.href = url
+    a.download = `groundwork-${slug}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleImportFile(file: File) {
+    try {
+      const parsed = JSON.parse(await file.text())
+      const newId = importProject(parsed)
+      if (!newId) throw new Error('Not a valid Groundwork export file.')
+      setImportMsg({ ok: true, text: 'Imported as a new project and switched to it.' })
+    } catch (e) {
+      setImportMsg({ ok: false, text: e instanceof Error ? e.message : 'Could not read that file.' })
+    }
+    if (fileRef.current) fileRef.current.value = ''
+  }
 
   async function checkProblem() {
     setBusy(true)
@@ -90,6 +118,19 @@ export function ProjectSettings() {
               <p className="text-xs font-semibold text-support-fg mb-1">BETTER</p>
               <p className="text-ink-soft">"Small marketing teams struggle to understand why individual ad creatives perform differently, so they repeat poor decisions and waste budget."</p>
             </div>
+          </Card>
+
+          <Card className="p-5">
+            <h3 className="section-title mb-2">Your data</h3>
+            <p className="text-sm text-ink-soft mb-3">Your work is saved in this browser. Export a project to back it up or move it to another device; import to bring it back.</p>
+            <div className="flex flex-col gap-2">
+              <button className="btn-outline w-full" onClick={handleExport}>↓ Export this project</button>
+              <button className="btn-outline w-full" onClick={() => fileRef.current?.click()}>↑ Import a project file</button>
+              <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleImportFile(f) }} />
+            </div>
+            {importMsg && (
+              <p className={`text-xs mt-2 ${importMsg.ok ? 'text-support-fg' : 'text-contra-fg'}`}>{importMsg.text}</p>
+            )}
           </Card>
 
           <Card className="p-5">

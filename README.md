@@ -99,8 +99,35 @@ npm run dev          # http://localhost:5173
 ```
 
 That's it — the demo project "Creative Memory" loads with mixed sample
-interviews. `npm run build` produces a production bundle; `npm run lint`
-type-checks.
+interviews, powered by the keyless mock AI engine. `npm run build` produces a
+production bundle; `npm run lint` type-checks.
+
+Your work is saved in the browser. On the **Project setup** page you can
+**Export** a project to a JSON file (backup / move to another machine) and
+**Import** it back — handy since there are no accounts.
+
+### Optional: turn on real AI (bring your own key)
+
+The mock engine is heuristic. To use a real model, run the bundled proxy so your
+API key stays server-side and never enters the browser bundle:
+
+```bash
+cp .env.example .env         # then set OPENAI_API_KEY=sk-...
+npm run proxy                # terminal 1  → http://localhost:8787
+npm run dev                  # terminal 2
+```
+
+In `.env`, set `VITE_AI_PROVIDER=openai` and
+`VITE_AI_PROXY_URL=http://localhost:8787`. The proxy defaults to the
+cost-efficient `gpt-4.1-mini` (`AI_MODEL` to change it) and also supports
+Anthropic (`AI_PROVIDER=anthropic` + `ANTHROPIC_API_KEY`). Every live response is
+still validated against the zod schemas in `src/ai/schemas.ts`, and any failure
+falls back to the mock so the UI never breaks. The sidebar footer shows the
+active provider.
+
+> Deploying this as a **public** tool on your own key? Don't expose the proxy
+> unprotected — add rate limiting, a bot check, and a spend cap first. The local
+> proxy here is meant for personal / development use.
 
 ### Optional: connect Supabase
 
@@ -113,18 +140,9 @@ type-checks.
 The sidebar footer shows whether the database is `Local (browser)` or
 `Supabase`.
 
-### Optional: connect a live LLM
-
-The mock engine emulates a real model's outputs. To go live:
-
-1. Stand up a small server-side proxy that accepts `{ prompt }`, calls your
-   model (e.g. Claude), and returns JSON conforming to the schemas in
-   `src/ai/schemas.ts`. Do **not** put a model key in the client bundle.
-2. Implement `callLLM()` in `src/ai/engine.ts` to POST to that proxy.
-3. Set `VITE_AI_PROVIDER=anthropic` and `VITE_AI_PROXY_URL=...`.
-
-Because every AI call already goes through the `ai` facade and validates its
-response with zod, swapping the engine changes nothing else in the app.
+Because every AI call goes through the `ai` facade (`src/ai/engine.ts`) and the
+`callLLM()` proxy seam, the mock and a live model are interchangeable — nothing
+else in the app changes.
 
 ---
 
@@ -136,13 +154,15 @@ src/
   ai/
     prompts.ts           # prompt templates (system rules + per-task prompts)
     schemas.ts           # zod schemas for every structured AI response
-    engine.ts            # ai facade: heuristic mock + live-provider seam
+    engine.ts            # ai facade: heuristic mock + live proxy seam (callLLM)
   store/
     seed.ts              # realistic mixed demo data
     useStore.ts          # zustand store + quality-weighted evidence scoring
     hooks.ts             # active-project selectors
   components/            # ui primitives + reusable domain widgets
   pages/                 # Overview, Hypotheses, Segments, Interviews, ...
+scripts/
+  ai-proxy.mjs           # zero-dep local proxy: keeps your model key server-side
 supabase/
   schema.sql             # Postgres schema + RLS
   seed.sql               # server-side demo seed

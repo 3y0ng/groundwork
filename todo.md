@@ -1,7 +1,21 @@
 # Groundwork — TODO
 
 Status of the build and everything still outstanding.
-Last updated: 2026-08-07
+Last updated: 2026-08-08
+
+---
+
+## Option B (open repo, BYO real AI) — DONE
+
+- [x] `callLLM()` proxy seam implemented in `src/ai/engine.ts` (provider `openai`
+      or `anthropic`), with graceful fallback to the mock on any failure.
+- [x] Bundled zero-dep local proxy `scripts/ai-proxy.mjs` + `npm run proxy`.
+      Verified: reaches OpenAI and returns/handles errors correctly.
+- [x] Data **export / import** (per-project JSON) in the store + Project setup
+      page. Verified: full id-remap round trip, no reference leakage.
+- [x] `.env.example`, README (three tiers), and an MIT `LICENSE`.
+- [ ] **Publish to GitHub** — gated on the user's explicit go (repo name +
+      public/private). Not done yet.
 
 ---
 

@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "proxy": "node --env-file-if-exists=.env scripts/ai-proxy.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

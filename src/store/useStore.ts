@@ -15,6 +15,20 @@ import {
   type EvidenceStrength,
 } from '@/types/domain'
 
+// A self-contained, portable bundle for one project. Because the hosted tool
+// is account-free, this is how a founder backs up or moves their work.
+export interface GroundworkBundle {
+  version: 1
+  exportedAt: string
+  project: Project
+  hypotheses: Hypothesis[]
+  segments: CustomerSegment[]
+  interviews: Interview[]
+  evidence: EvidenceItem[]
+  decisions: Decision[]
+  insights: Insight[]
+}
+
 interface State {
   projects: Project[]
   hypotheses: Hypothesis[]
@@ -60,6 +74,10 @@ interface State {
 
   // templates
   addTemplate: (t: Omit<InterviewTemplate, 'id'>) => string
+
+  // portability
+  exportProject: (projectId: string) => GroundworkBundle
+  importProject: (bundle: unknown) => string | null
 
   resetDemo: () => void
 }
@@ -133,6 +151,63 @@ export const useStore = create<State>()(
         const id = uid('tpl')
         set(s => ({ templates: [...s.templates, { ...t, id }] }))
         return id
+      },
+
+      exportProject: projectId => {
+        const s = get()
+        return {
+          version: 1,
+          exportedAt: nowISO(),
+          project: s.projects.find(p => p.id === projectId)!,
+          hypotheses: s.hypotheses.filter(h => h.projectId === projectId),
+          segments: s.segments.filter(x => x.projectId === projectId),
+          interviews: s.interviews.filter(x => x.projectId === projectId),
+          evidence: s.evidence.filter(x => x.projectId === projectId),
+          decisions: s.decisions.filter(x => x.projectId === projectId),
+          insights: s.insights.filter(x => x.projectId === projectId),
+        }
+      },
+
+      importProject: bundle => {
+        const b = bundle as Partial<GroundworkBundle>
+        if (!b || !b.project || !Array.isArray(b.hypotheses)) return null
+
+        // Regenerate every id so an import never collides with existing data,
+        // then rewrite all cross-references through the same map.
+        const map = new Map<string, string>()
+        const idFor = (old: string, prefix: string) => {
+          if (!map.has(old)) map.set(old, uid(prefix))
+          return map.get(old)!
+        }
+        const remap = (id?: string) => (id ? map.get(id) ?? id : id)
+
+        const newProjectId = idFor(b.project.id, 'proj')
+        ;(b.hypotheses ?? []).forEach(h => idFor(h.id, 'hyp'))
+        ;(b.segments ?? []).forEach(x => idFor(x.id, 'seg'))
+        ;(b.interviews ?? []).forEach(x => idFor(x.id, 'int'))
+        ;(b.evidence ?? []).forEach(x => idFor(x.id, 'ev'))
+        ;(b.decisions ?? []).forEach(x => idFor(x.id, 'dec'))
+        ;(b.insights ?? []).forEach(x => idFor(x.id, 'ins'))
+
+        const project: Project = { ...b.project, id: newProjectId, name: `${b.project.name} (imported)`, createdAt: nowISO() }
+        const hypotheses = (b.hypotheses ?? []).map(h => ({ ...h, id: remap(h.id)!, projectId: newProjectId, segmentIds: (h.segmentIds ?? []).map(x => remap(x)!) }))
+        const segments = (b.segments ?? []).map(x => ({ ...x, id: remap(x.id)!, projectId: newProjectId, hypothesisIds: (x.hypothesisIds ?? []).map(h => remap(h)!) }))
+        const interviews = (b.interviews ?? []).map(x => ({ ...x, id: remap(x.id)!, projectId: newProjectId, segmentId: remap(x.segmentId), hypothesisIds: (x.hypothesisIds ?? []).map(h => remap(h)!) }))
+        const evidence = (b.evidence ?? []).map(x => ({ ...x, id: remap(x.id)!, projectId: newProjectId, interviewId: remap(x.interviewId)!, segmentId: remap(x.segmentId), hypothesisIds: (x.hypothesisIds ?? []).map(h => remap(h)!) }))
+        const decisions = (b.decisions ?? []).map(x => ({ ...x, id: remap(x.id)!, projectId: newProjectId, hypothesisId: remap(x.hypothesisId)! }))
+        const insights = (b.insights ?? []).map(x => ({ ...x, id: remap(x.id)!, projectId: newProjectId, refId: remap(x.refId) }))
+
+        set(s => ({
+          projects: [...s.projects, project],
+          hypotheses: [...s.hypotheses, ...hypotheses],
+          segments: [...s.segments, ...segments],
+          interviews: [...s.interviews, ...interviews],
+          evidence: [...s.evidence, ...evidence],
+          decisions: [...s.decisions, ...decisions],
+          insights: [...s.insights, ...insights],
+          activeProjectId: newProjectId,
+        }))
+        return newProjectId
       },
 
       resetDemo: () =>

@@ -1,9 +1,14 @@
 // ---------------------------------------------------------------------------
 // AI engine facade.
 // Exposes one typed API used across the app. Default implementation is a
-// heuristic mock that reads the actual note text (no network, no key). To go
-// live, implement `callLLM` against your proxy using PROMPT + the zod schemas
-// and flip VITE_AI_PROVIDER=anthropic.
+// heuristic mock that reads the actual note text (no network, no key).
+//
+// To use a real model, run the bundled proxy (`npm run proxy`, see
+// scripts/ai-proxy.mjs) and set VITE_AI_PROVIDER=openai +
+// VITE_AI_PROXY_URL=http://localhost:8787. Every live call still validates
+// against the zod schemas below, and any failure falls back to the mock so the
+// UI never dead-ends. The proxy holds the model key — it never touches the
+// client bundle.
 // ---------------------------------------------------------------------------
 
 import {
@@ -65,15 +70,38 @@ const STRONG_ALTERNATIVES = [
 ]
 
 // ---------------------------------------------------------------------------
-// Live-provider seam. Left unimplemented on purpose: wiring a real key into a
-// public client bundle is unsafe. Point VITE_AI_PROXY_URL at a server route
-// that forwards { prompt } to your model and returns schema-valid JSON.
+// Live-provider seam. POSTs { prompt, schema } to the proxy named by
+// VITE_AI_PROXY_URL and returns the parsed JSON object. The model key lives on
+// the proxy only. `schema` is the schema name — the proxy can use it to enforce
+// structured output; a strict server (Option A) would look it up server-side.
 // ---------------------------------------------------------------------------
-async function callLLM(_prompt: string): Promise<unknown> {
-  throw new Error(
-    'Live AI provider not implemented in this build. Set VITE_AI_PROVIDER=mock, or ' +
-      'implement callLLM() in src/ai/engine.ts against your proxy (see prompts.ts + schemas.ts).',
-  )
+async function callLLM(prompt: string, schema: string): Promise<unknown> {
+  const proxyUrl = import.meta.env.VITE_AI_PROXY_URL
+  if (!proxyUrl) {
+    throw new Error('VITE_AI_PROXY_URL is not set. Start the proxy (npm run proxy) or use VITE_AI_PROVIDER=mock.')
+  }
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 45_000)
+  try {
+    const res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt, schema }),
+      signal: controller.signal,
+    })
+    if (!res.ok) {
+      throw new Error(`AI proxy returned ${res.status}: ${await res.text().catch(() => '')}`)
+    }
+    return await res.json()
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+// When a live call fails, log and let the caller fall through to the mock so
+// the UI keeps working.
+function warnFallback(name: string, e: unknown) {
+  console.warn(`[groundwork] live AI "${name}" failed; using mock engine instead.`, e)
 }
 
 // A tiny delay so the UI can show a "thinking" state realistically.
@@ -85,7 +113,10 @@ const think = <T>(value: T, ms = 450): Promise<T> =>
 // ---------------------------------------------------------------------------
 export const ai = {
   async critiqueProblem(statement: string): Promise<ProblemCritique> {
-    if (!isMockAI) return ProblemCritiqueSchema.parse(await callLLM(PROMPT.problemCritique(statement)))
+    if (!isMockAI) {
+      try { return ProblemCritiqueSchema.parse(await callLLM(PROMPT.problemCritique(statement), 'ProblemCritique')) }
+      catch (e) { warnFallback('critiqueProblem', e) }
+    }
     const solutionWords = ['dashboard', 'platform', 'app', 'ai ', 'ai-', 'tool that', 'software that', 'system that', 'solution that', 'automate', 'saas', 'need a', 'needs a', 'needs an', 'need an']
     const hasConsequence = has(statement, ['causing', 'so that', 'because', 'which means', 'leading to', 'resulting in', 'costs', 'waste', 'wasting', 'lose', 'losing', 'miss'])
     const looksLikeSolution = has(statement, solutionWords) && !hasConsequence
@@ -103,7 +134,10 @@ export const ai = {
   },
 
   async rewriteHypothesis(belief: string): Promise<HypothesisRewrite> {
-    if (!isMockAI) return HypothesisRewriteSchema.parse(await callLLM(PROMPT.hypothesisRewrite(belief)))
+    if (!isMockAI) {
+      try { return HypothesisRewriteSchema.parse(await callLLM(PROMPT.hypothesisRewrite(belief), 'HypothesisRewrite')) }
+      catch (e) { warnFallback('rewriteHypothesis', e) }
+    }
     const issues: string[] = []
     if (!has(belief, ['when', 'during', 'after', 'while'])) issues.push('No context — add when the problem occurs.')
     if (!has(belief, ['causing', 'so', 'which means', 'leading', 'costs', 'waste'])) issues.push('No consequence — add what it costs them.')
@@ -120,7 +154,10 @@ export const ai = {
   },
 
   async suggestSegments(problem: string): Promise<SegmentSuggestion> {
-    if (!isMockAI) return SegmentSuggestionSchema.parse(await callLLM(PROMPT.segmentSuggestions(problem)))
+    if (!isMockAI) {
+      try { return SegmentSuggestionSchema.parse(await callLLM(PROMPT.segmentSuggestions(problem), 'SegmentSuggestion')) }
+      catch (e) { warnFallback('suggestSegments', e) }
+    }
     return think({
       suggestions: [
         { name: 'Practitioners who own the workflow daily', rationale: 'Closest to the pain and its consequences.', observableTraits: ['Does the task themselves', 'Feels the cost first-hand', 'Has an existing workaround'] },
@@ -131,7 +168,10 @@ export const ai = {
   },
 
   async generateGuide(ctx: { hypothesis: string; segment: string; objective: string; known: string; uncertain: string }): Promise<InterviewGuide> {
-    if (!isMockAI) return InterviewGuideSchema.parse(await callLLM(PROMPT.interviewGuide(ctx)))
+    if (!isMockAI) {
+      try { return InterviewGuideSchema.parse(await callLLM(PROMPT.interviewGuide(ctx), 'InterviewGuide')) }
+      catch (e) { warnFallback('generateGuide', e) }
+    }
     return think({
       questions: [
         { section: 'context', text: `What does a typical week look like for you when it comes to ${ctx.objective || 'this area'}?`, rationale: 'Grounds the conversation in their real world before any specifics.' },
@@ -150,7 +190,10 @@ export const ai = {
   },
 
   async reviewQuestion(question: string): Promise<QuestionReview> {
-    if (!isMockAI) return QuestionReviewSchema.parse(await callLLM(PROMPT.questionReview(question)))
+    if (!isMockAI) {
+      try { return QuestionReviewSchema.parse(await callLLM(PROMPT.questionReview(question), 'QuestionReview')) }
+      catch (e) { warnFallback('reviewQuestion', e) }
+    }
     const hit = WEAK_PATTERNS.find(p => p.re.test(question))
     if (hit) {
       const replacement = STRONG_ALTERNATIVES[Math.abs(hashish(question)) % STRONG_ALTERNATIVES.length]
@@ -160,29 +203,41 @@ export const ai = {
   },
 
   async extractEvidence(notes: string): Promise<EvidenceExtraction> {
-    if (!isMockAI) return EvidenceExtractionSchema.parse(await callLLM(PROMPT.evidenceExtraction(notes)))
+    if (!isMockAI) {
+      try { return EvidenceExtractionSchema.parse(await callLLM(PROMPT.evidenceExtraction(notes), 'EvidenceExtraction')) }
+      catch (e) { warnFallback('extractEvidence', e) }
+    }
     const items = sentences(notes).map(s => classifySentence(s)).filter(Boolean) as EvidenceExtraction['items']
     return think({ items })
   },
 
   async feedback(notes: string, transcript?: string): Promise<InterviewFeedback> {
-    if (!isMockAI) return InterviewFeedbackSchema.parse(await callLLM(PROMPT.interviewFeedback(notes, transcript)))
+    if (!isMockAI) {
+      try { return InterviewFeedbackSchema.parse(await callLLM(PROMPT.interviewFeedback(notes, transcript), 'InterviewFeedback')) }
+      catch (e) { warnFallback('feedback', e) }
+    }
     return think(buildFeedback(notes, transcript), 650)
   },
 
   async consolidate(hypothesis: string, rows: { label: string; text: string }[]): Promise<Consolidation> {
-    if (!isMockAI)
-      return ConsolidationSchema.parse(
-        await callLLM(PROMPT.consolidation(hypothesis, rows.map(r => `- ${r.label}: ${r.text}`).join('\n'))),
-      )
+    if (!isMockAI) {
+      try {
+        return ConsolidationSchema.parse(
+          await callLLM(PROMPT.consolidation(hypothesis, rows.map(r => `- ${r.label}: ${r.text}`).join('\n')), 'Consolidation'),
+        )
+      } catch (e) { warnFallback('consolidate', e) }
+    }
     return think(buildConsolidation(rows))
   },
 
   async recommendDecision(hypothesis: string, consolidation: Consolidation): Promise<DecisionRecommendation> {
-    if (!isMockAI)
-      return DecisionRecommendationSchema.parse(
-        await callLLM(PROMPT.decision(hypothesis, JSON.stringify(consolidation))),
-      )
+    if (!isMockAI) {
+      try {
+        return DecisionRecommendationSchema.parse(
+          await callLLM(PROMPT.decision(hypothesis, JSON.stringify(consolidation)), 'DecisionRecommendation'),
+        )
+      } catch (e) { warnFallback('recommendDecision', e) }
+    }
     return think(buildDecision(consolidation))
   },
 }

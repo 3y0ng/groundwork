@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Sidebar } from '@/components/Sidebar'
+import { WelcomeModal, SetupGuide } from '@/components/Onboarding'
+import { useUI, WELCOME_KEY } from '@/store/ui'
 import { Overview } from '@/pages/Overview'
 import { Hypotheses } from '@/pages/Hypotheses'
 import { HypothesisDetail } from '@/pages/HypothesisDetail'
@@ -12,6 +15,16 @@ import { Decisions } from '@/pages/Decisions'
 import { ProjectSettings } from '@/pages/ProjectSettings'
 
 export default function App() {
+  const [welcome, setWelcome] = useState(() => {
+    try { return !localStorage.getItem(WELCOME_KEY) } catch { return false }
+  })
+  const { setupOpen, openSetup, closeSetup } = useUI()
+
+  const dismissWelcome = () => {
+    try { localStorage.setItem(WELCOME_KEY, '1') } catch { /* ignore */ }
+    setWelcome(false)
+  }
+
   return (
     <div className="flex min-h-screen bg-canvas">
       <Sidebar />
@@ -31,6 +44,9 @@ export default function App() {
           </Routes>
         </div>
       </main>
+
+      {welcome && <WelcomeModal onClose={dismissWelcome} onOpenSetup={openSetup} />}
+      <SetupGuide open={setupOpen} onClose={closeSetup} />
     </div>
   )
 }

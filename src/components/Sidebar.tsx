@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { useStore } from '@/store/useStore'
+import { useUI } from '@/store/ui'
 import { isMockAI, aiProviderLabel } from '@/ai/engine'
 import { supabaseEnabled } from '@/lib/supabase'
 
@@ -16,6 +17,7 @@ const NAV: { to: string; label: string; glyph: string; end?: boolean }[] = [
 
 export function Sidebar() {
   const { projects, activeProjectId, setActiveProject } = useStore()
+  const openSetup = useUI(s => s.openSetup)
   const active = projects.find(p => p.id === activeProjectId) ?? projects[0]
 
   return (
@@ -62,14 +64,31 @@ export function Sidebar() {
       </nav>
 
       <div className="px-4 py-3 border-t border-line space-y-1.5">
-        <StatusLine label="AI" ok={true} value={isMockAI ? `${aiProviderLabel}` : aiProviderLabel} tone={isMockAI ? 'muted' : 'good'} />
-        <StatusLine label="Database" ok={supabaseEnabled} value={supabaseEnabled ? 'Supabase' : 'Local (browser)'} tone={supabaseEnabled ? 'good' : 'muted'} />
+        <button
+          onClick={openSetup}
+          className="w-full flex items-center justify-between text-[11px] rounded-md -mx-1 px-1 py-0.5 hover:bg-black/[0.03] transition-colors"
+          title="Set up real AI"
+        >
+          <span className="text-ink-faint">AI</span>
+          <span className="flex items-center gap-1.5 text-ink-soft">
+            <span className={cn('w-1.5 h-1.5 rounded-full', isMockAI ? 'bg-ink-faint/50' : 'bg-support-fg')} />
+            {aiProviderLabel}
+            {isMockAI && <span className="text-brand-600">· Enable</span>}
+          </span>
+        </button>
+        <StatusLine label="Database" value={supabaseEnabled ? 'Supabase' : 'Local (browser)'} tone={supabaseEnabled ? 'good' : 'muted'} />
+        <div className="pt-2 mt-1 border-t border-line flex items-center justify-between">
+          <a href="https://pyreel.com" target="_blank" rel="noreferrer" className="text-[11px] text-ink-faint hover:text-ink-soft transition-colors">
+            Made by <span className="font-medium text-ink-soft">Pyreel</span>
+          </a>
+          <button onClick={openSetup} className="text-[11px] text-ink-faint hover:text-ink-soft transition-colors">Setup &amp; help</button>
+        </div>
       </div>
     </aside>
   )
 }
 
-function StatusLine({ label, value, tone }: { label: string; ok: boolean; value: string; tone: 'good' | 'muted' }) {
+function StatusLine({ label, value, tone }: { label: string; value: string; tone: 'good' | 'muted' }) {
   return (
     <div className="flex items-center justify-between text-[11px]">
       <span className="text-ink-faint">{label}</span>

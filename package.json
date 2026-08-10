@@ -4,6 +4,21 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Evidence-based customer discovery workspace for early-stage founders.",
+  "author": "Pyreel (https://pyreel.com)",
+  "homepage": "https://github.com/3y0ng/groundwork#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3y0ng/groundwork.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "customer-discovery",
+    "startup-validation",
+    "mom-test",
+    "jobs-to-be-done",
+    "lean-startup",
+    "product-discovery"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

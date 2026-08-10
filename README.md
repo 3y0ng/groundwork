@@ -1,6 +1,8 @@
 # Groundwork
 
 **An evidence-based customer-discovery workspace for early-stage founders.**
+Made by [Pyreel](https://pyreel.com) · MIT licensed · New here? See
+[SETUP.md](SETUP.md).
 
 Groundwork helps a founder move from
 
@@ -194,3 +196,8 @@ logistics.
 - Never treat compliments as validation or interview count as evidence quality.
 - Always explain reasoning and point back to the source text.
 - Always keep the founder's interpretation separate and easy to correct.
+
+---
+
+Built by [Pyreel](https://pyreel.com) — AI ad-creative and performance tooling
+for founders and growth teams. Released under the MIT License.

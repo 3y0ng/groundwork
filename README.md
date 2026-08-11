@@ -18,13 +18,18 @@ It does that by making the *quality* of evidence visible, and by refusing to
 let vague validation, compliments, hypotheticals, and leading questions
 masquerade as proof.
 
+![Groundwork overview dashboard](docs/screenshots/overview.png)
+
 ---
 
 ## The methodology (why the product is shaped this way)
 
 Groundwork translates a handful of well-established discovery principles into
-workflow and feedback. No book text is reproduced; these are the underlying
-ideas, expressed in the product's own guidance:
+workflow and feedback. The interview approach is grounded in **The Mom Test**
+(Rob Fitzpatrick), alongside customer development, lean startup experimentation,
+jobs-to-be-done interviews, and evidence-based product discovery. No book text is
+reproduced; these are the underlying ideas, expressed in the product's own
+guidance:
 
 1. **Ask about the past, not the future.** What someone *did* is evidence.
    What they *say they would do* is a prediction, and people are bad at it. The
@@ -76,6 +81,30 @@ Overview → **Hypotheses** → **Customer Segments** → **Interviews** →
 8. Consolidate evidence across interviews into a reasoned conclusion.
 9. Record a decision, continue, narrow, refine, proceed, pause, reject, pivot, 
    with the evidence behind it and what would change your mind.
+
+### What it looks like
+
+Interview-quality feedback: a score, talk ratio, and per-dimension coaching on
+what weakened the evidence and how to ask better next time.
+
+![Interview quality feedback](docs/screenshots/interview-feedback.png)
+
+Consolidated conclusion: evidence weighed by quality across interviews, reasoned
+rather than majority-voted. Here it lands on "partially supported, frequent but
+urgency unproven" instead of a thumbs-up.
+
+![Consolidated hypothesis conclusion](docs/screenshots/hypothesis-consolidation.png)
+
+Evidence board: every quote-backed item in one place, classified and filterable
+by supporting vs contradicting, so you never see only the encouraging half.
+
+![Evidence board](docs/screenshots/evidence-board.png)
+
+ICP prioritisation matrix: compare segments on severity, frequency, urgency,
+spend, access, and evidence strength, so a well-liked-but-unproven segment does
+not outrank one with real signal.
+
+![ICP prioritisation matrix](docs/screenshots/segments-matrix.png)
 
 ---
 

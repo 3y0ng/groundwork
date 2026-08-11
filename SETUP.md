@@ -1,12 +1,12 @@
 # Setup guide
 
-Groundwork runs in three tiers. Start at tier 1 — it needs nothing — and add the
+Groundwork runs in three tiers. Start at tier 1, it needs nothing, and add the
 others only when you want them. There is also an in-app version of this guide:
 click **AI** (or **Setup & help**) at the bottom of the sidebar.
 
 ---
 
-## Tier 1 — Just run it (no config, keyless mock AI)
+## Tier 1, Just run it (no config, keyless mock AI)
 
 ```bash
 git clone https://github.com/3y0ng/groundwork.git
@@ -16,7 +16,7 @@ npm run dev            # http://localhost:5173
 ```
 
 The demo project "Creative Memory" loads with mixed sample interviews. The AI is
-a **heuristic mock** that reads your note text — no key, no network. This is
+a **heuristic mock** that reads your note text, no key, no network. This is
 enough to explore the whole workflow.
 
 Your work is saved in the browser. On the **Project setup** page, use **Export**
@@ -34,7 +34,7 @@ Useful scripts:
 
 ---
 
-## Tier 2 — Real AI (bring your own key)
+## Tier 2, Real AI (bring your own key)
 
 The app never holds your model key. Instead it talks to a tiny local proxy
 (`scripts/ai-proxy.mjs`) that keeps the key server-side.
@@ -55,7 +55,7 @@ Get an OpenAI key at <https://platform.openai.com/api-keys>, then set these in
 VITE_AI_PROVIDER=openai
 VITE_AI_PROXY_URL=http://localhost:8787
 
-# server-side only — never shipped to the browser
+# server-side only, never shipped to the browser
 AI_PROVIDER=openai
 AI_MODEL=gpt-4.1-mini
 OPENAI_API_KEY=sk-your-key-here
@@ -72,14 +72,14 @@ npm run proxy         # terminal 1  → http://localhost:8787
 npm run dev           # terminal 2
 ```
 
-Reload the app — the sidebar AI status will read **OpenAI**. Health check:
+Reload the app, the sidebar AI status will read **OpenAI**. Health check:
 `curl http://localhost:8787/health`.
 
 ### How it behaves
 
 - Every live response is validated against the app's zod schemas
   (`src/ai/schemas.ts`). If a call fails or returns malformed JSON, the app
-  automatically **falls back to the mock** — it never dead-ends.
+  automatically **falls back to the mock**, so it never dead-ends.
 - The proxy prints one line per request so you can watch usage.
 
 ### Troubleshooting
@@ -98,7 +98,7 @@ Reload the app — the sidebar AI status will read **OpenAI**. Health check:
 
 ---
 
-## Tier 3 — Persistent database (optional, Supabase)
+## Tier 3, Persistent database (optional, Supabase)
 
 By default data lives in the browser. To add hosted auth and a shared Postgres
 database:

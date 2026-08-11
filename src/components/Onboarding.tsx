@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Onboarding: a one-time first-run walkthrough + an "enable real AI" setup
-// guide. Kept deliberately light — one modal each, no multi-step coach-marks.
+// guide. Kept deliberately light, one modal each, no multi-step coach-marks.
 // ---------------------------------------------------------------------------
 
 import { useState } from 'react'
@@ -13,46 +13,34 @@ const REPO = 'https://github.com/3y0ng/groundwork'
 
 // --- First-run welcome -----------------------------------------------------
 const STEPS = [
-  { n: 1, title: 'Frame the problem', body: 'State who hurts and why — not the product you want to build. Groundwork flags problem statements that are secretly solutions.' },
-  { n: 2, title: 'Break it into hypotheses', body: 'Turn the belief into specific, testable claims, and decide up front what would prove each one wrong.' },
-  { n: 3, title: 'Interview & capture evidence', body: 'Ask about real past behaviour. Every quote is classified — behaviour and commitment count for more than opinions.' },
-  { n: 4, title: 'Consolidate & decide', body: 'Weigh the evidence by quality, not headcount, then record a decision: continue, narrow, pivot, or proceed.' },
+  { n: 1, title: 'Frame the problem', body: 'Describe who hurts and why, not the product you want to build.' },
+  { n: 2, title: 'Break it into hypotheses', body: 'Turn the belief into testable claims, and decide what would prove each wrong.' },
+  { n: 3, title: 'Interview and capture evidence', body: 'Ask about real past behaviour. What people did counts for more than what they say.' },
+  { n: 4, title: 'Consolidate and decide', body: 'Weigh evidence by quality, then choose: continue, narrow, pivot, or proceed.' },
 ]
 
-export function WelcomeModal({ onClose, onOpenSetup, onStartFresh }: { onClose: () => void; onOpenSetup: () => void; onStartFresh: () => void }) {
+export function WelcomeModal({ onClose, onStartFresh }: { onClose: () => void; onStartFresh: () => void }) {
   return (
-    <Modal open onClose={onClose} wide title="Welcome to Groundwork" sub="Turn “I think this is a problem” into evidence you can trust.">
-      <div className="space-y-4">
-        <div className="grid sm:grid-cols-2 gap-2.5">
+    <Modal open onClose={onClose} title="Welcome to Groundwork" sub="Turn a hunch into evidence you can trust. The path:">
+      <div className="space-y-5">
+        <ol className="space-y-3.5">
           {STEPS.map(s => (
-            <div key={s.n} className="rounded-lg border border-line p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs grid place-items-center font-semibold">{s.n}</span>
-                <span className="font-semibold text-sm text-ink">{s.title}</span>
+            <li key={s.n} className="flex gap-3">
+              <span className="w-5 h-5 shrink-0 rounded-full bg-brand-500 text-white text-xs grid place-items-center font-semibold mt-0.5">{s.n}</span>
+              <div>
+                <p className="font-medium text-sm text-ink">{s.title}</p>
+                <p className="text-sm text-ink-soft leading-snug">{s.body}</p>
               </div>
-              <p className="text-xs text-ink-soft leading-relaxed">{s.body}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
 
-        <Callout tone="info" title="One principle underneath all of it">
-          Compliments and “I would use that” are not validation. Groundwork weighs what people
-          <em> did </em> over what they <em>say</em>, so enthusiasm never masquerades as proof.
-        </Callout>
-
-        <div className="rounded-lg bg-canvas border border-line p-3 text-sm text-ink-soft flex items-start justify-between gap-3">
-          <p>
-            Everything runs offline on a <strong>keyless demo AI</strong>. Want real AI on your own
-            key? It takes about a minute — <button className="text-brand-600 hover:underline font-medium" onClick={() => { onClose(); onOpenSetup() }}>set it up</button>.
-          </p>
+        <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-line">
+          <button className="btn-outline flex-1" onClick={onClose}>Explore the demo</button>
+          <button className="btn-primary flex-1" onClick={onStartFresh}>Start my own project</button>
         </div>
-
-        <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-line">
-          <button className="btn-outline" onClick={onClose}>Explore the demo</button>
-          <button className="btn-primary" onClick={onStartFresh}>Start my own project →</button>
-        </div>
-        <p className="text-xs text-ink-faint text-center -mt-1">
-          Exploring the demo? It’s a worked example with mixed evidence. Starting your own gives you a blank slate.
+        <p className="text-xs text-ink-faint text-center">
+          Runs on a free demo AI. Add your own key anytime from Setup.
         </p>
       </div>
     </Modal>
@@ -64,7 +52,7 @@ const ENV_BLOCK = `# --- turn on real AI (bring your own key) ---
 VITE_AI_PROVIDER=openai
 VITE_AI_PROXY_URL=http://localhost:8787
 
-# server-side only — never shipped to the browser
+# server-side only, never shipped to the browser
 AI_PROVIDER=openai
 AI_MODEL=gpt-4.1-mini
 OPENAI_API_KEY=sk-your-key-here`
@@ -78,7 +66,7 @@ export function SetupGuide({ open, onClose }: { open: boolean; onClose: () => vo
           <span className={cn('w-2 h-2 rounded-full', isMockAI ? 'bg-ink-faint/60' : 'bg-support-fg')} />
           <span className="text-ink-soft">
             Current AI: <strong className="text-ink">{aiProviderLabel}</strong>
-            {isMockAI ? ' — follow the steps below to switch to a real model.' : ' — connected. You’re all set.'}
+            {isMockAI ? ', follow the steps below to switch to a real model.' : ', connected. You’re all set.'}
           </span>
         </div>
 
@@ -95,23 +83,23 @@ export function SetupGuide({ open, onClose }: { open: boolean; onClose: () => vo
             In one terminal: <Code>npm run proxy</Code> It listens on <code className="text-xs">http://localhost:8787</code> and holds your key.
           </Step>
           <Step n={4} title="Run the app">
-            In another terminal: <Code>npm run dev</Code> Reload — the sidebar will show <strong>OpenAI</strong> instead of Mock engine.
+            In another terminal: <Code>npm run dev</Code> Reload, the sidebar will show <strong>OpenAI</strong> instead of Mock engine.
           </Step>
         </ol>
 
         <Callout tone="good" title="Safe by default">
           Every live response is validated against the app’s schemas, and any failure automatically
-          falls back to the mock engine — so the app never breaks, and you’re never billed for a broken call.
+          falls back to the mock engine, so the app never breaks, and you’re never billed for a broken call.
         </Callout>
 
         <div className="grid sm:grid-cols-2 gap-3 text-sm">
           <div className="rounded-lg border border-line p-3">
             <p className="font-semibold text-ink mb-0.5">Back up your work</p>
-            <p className="text-ink-soft text-xs">No account needed — use <strong>Export / Import</strong> on the Project setup page to save a project to a file or move it between machines.</p>
+            <p className="text-ink-soft text-xs">No account needed, use <strong>Export / Import</strong> on the Project setup page to save a project to a file or move it between machines.</p>
           </div>
           <div className="rounded-lg border border-line p-3">
             <p className="font-semibold text-ink mb-0.5">Persistent database (optional)</p>
-            <p className="text-ink-soft text-xs">{supabaseEnabled ? 'Supabase is configured.' : 'Add Supabase for hosted auth + a shared database — see the repo README.'}</p>
+            <p className="text-ink-soft text-xs">{supabaseEnabled ? 'Supabase is configured.' : 'Add Supabase for hosted auth + a shared database, see the repo README.'}</p>
           </div>
         </div>
 

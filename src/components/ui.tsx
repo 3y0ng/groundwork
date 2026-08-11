@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Small shared UI primitives. Deliberately plain — the product should feel
+// Small shared UI primitives. Deliberately plain, the product should feel
 // calm and analytical, not decorative.
 // ---------------------------------------------------------------------------
 

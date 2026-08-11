@@ -83,14 +83,14 @@ export function StatusBadge({ status }: { status: HypothesisStatus }) {
   return <Chip tone={m.tone}>{m.label}</Chip>
 }
 
-// Question quality warning — reused by planner + notes.
+// Question quality warning, reused by planner + notes.
 export function QuestionWarning({
   problem, reason, replacement,
 }: { problem: string; reason: string; replacement: string }) {
   return (
     <div className="rounded-lg border border-unclear-line bg-unclear-bg px-3 py-2.5 text-sm">
       <p className="font-semibold text-unclear-fg flex items-center gap-1.5">
-        <span aria-hidden>⚠</span> Weak question — {problem}
+        <span aria-hidden>⚠</span> Weak question, {problem}
       </p>
       <p className="text-ink-soft mt-1">{reason}</p>
       <p className="mt-2 text-ink">

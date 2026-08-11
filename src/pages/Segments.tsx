@@ -5,7 +5,7 @@ import { useStore, scoreEvidence } from '@/store/useStore'
 import type { CustomerSegment } from '@/types/domain'
 import { cn } from '@/lib/utils'
 
-// ICP prioritisation dimensions — each scored 1-5 from segment fields.
+// ICP prioritisation dimensions, each scored 1-5 from segment fields.
 const MATRIX_DIMS: { key: string; label: string; get: (s: CustomerSegment, ctx: Ctx) => number }[] = [
   { key: 'severity', label: 'Severity', get: s => s.severity },
   { key: 'frequency', label: 'Frequency', get: s => freqScore(s.frequency) },
@@ -39,7 +39,7 @@ export function Segments() {
     <div>
       <SectionHeading
         title="Customer Segments"
-        sub="Prioritise by observable characteristics and buying behaviour — not fictional persona details."
+        sub="Prioritise by observable characteristics and buying behaviour, not fictional persona details."
         action={<button className="btn-primary" onClick={() => setOpen(true)}>+ New segment</button>}
       />
 
@@ -128,7 +128,7 @@ function ScoreCell({ v }: { v: number }) {
 }
 
 function Row({ k, v }: { k: string; v: string }) {
-  return <div className="flex gap-2"><dt className="text-ink-faint w-20 shrink-0">{k}</dt><dd className="text-ink-soft">{v || '—'}</dd></div>
+  return <div className="flex gap-2"><dt className="text-ink-faint w-20 shrink-0">{k}</dt><dd className="text-ink-soft">{v || '-'}</dd></div>
 }
 
 function CompareTable({ segments }: { segments: CustomerSegment[] }) {
@@ -203,7 +203,7 @@ function NewSegmentModal({ projectId, onClose }: { projectId: string; onClose: (
           <Field label="Why this segment may care"><textarea className="input min-h-[56px]" onChange={e => set('whyCare', e.target.value)} /></Field>
           <Field label="Why this segment may not care"><textarea className="input min-h-[56px]" onChange={e => set('whyNotCare', e.target.value)} /></Field>
         </div>
-        <Callout tone="info">Accessibility and severity feed the prioritisation matrix. Be honest about "why they may not care" — it protects you from wishful targeting.</Callout>
+        <Callout tone="info">Accessibility and severity feed the prioritisation matrix. Be honest about "why they may not care", it protects you from wishful targeting.</Callout>
         <div className="flex justify-end gap-2 pt-2 border-t border-line">
           <button className="btn-ghost" onClick={onClose}>Cancel</button>
           <button className="btn-primary" onClick={() => {

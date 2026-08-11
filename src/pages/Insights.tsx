@@ -29,7 +29,7 @@ export function Insights() {
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState title="No insights captured" body="After analysing interviews, record the patterns that will actually shape your decisions — especially the uncomfortable ones." action={<button className="btn-primary" onClick={() => setOpen(true)}>Capture an insight</button>} />
+        <EmptyState title="No insights captured" body="After analysing interviews, record the patterns that will actually shape your decisions, especially the uncomfortable ones." action={<button className="btn-primary" onClick={() => setOpen(true)}>Capture an insight</button>} />
       ) : (
         <div className="grid md:grid-cols-2 gap-3">
           {filtered.map(i => {

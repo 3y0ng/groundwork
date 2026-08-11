@@ -13,12 +13,12 @@ function ev(kind: EvidenceKind, direction: EvidenceDirection): EvidenceItem {
   }
 }
 
-describe('scoreEvidence — quality is weighted, not counted', () => {
+describe('scoreEvidence, quality is weighted, not counted', () => {
   it('returns "none" for no evidence', () => {
     expect(scoreEvidence([]).strength).toBe('none')
   })
 
-  it('treats compliments as worthless — three of them are still "none"', () => {
+  it('treats compliments as worthless, three of them are still "none"', () => {
     const s = scoreEvidence([
       ev('compliment', 'supports'), ev('compliment', 'supports'), ev('compliment', 'supports'),
     ])

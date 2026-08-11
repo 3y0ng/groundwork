@@ -23,7 +23,7 @@ export function Hypotheses() {
       {hypotheses.length === 0 ? (
         <EmptyState
           title="No hypotheses yet"
-          body="A hypothesis names a specific segment, a problem, a context, and a consequence — plus the bar of evidence you'll accept as support."
+          body="A hypothesis names a specific segment, a problem, a context, and a consequence, plus the bar of evidence you'll accept as support."
           action={<button className="btn-primary" onClick={() => setOpen(true)}>Create your first hypothesis</button>}
         />
       ) : (

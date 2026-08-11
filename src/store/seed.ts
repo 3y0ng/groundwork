@@ -245,7 +245,7 @@ const interviews: Interview[] = [
     severity: 'Low',
     decisionProcess: 'n/a',
     commitments: 'None.',
-    followUps: 'Low priority — note as low-urgency signal.',
+    followUps: 'Low priority, note as low-urgency signal.',
     createdAt: '2026-07-22T15:00:00.000Z',
   },
   {
@@ -299,7 +299,7 @@ const interviews: Interview[] = [
     severity: 'None',
     decisionProcess: 'Solo.',
     commitments: 'None.',
-    followUps: 'Likely wrong segment — low creative volume.',
+    followUps: 'Likely wrong segment, low creative volume.',
     createdAt: '2026-07-26T15:00:00.000Z',
   },
   {
@@ -354,8 +354,8 @@ const interviews: Interview[] = [
     frequency: 'Monthly review cadence.',
     severity: 'Low personally',
     decisionProcess: 'Owns budget, defers to team need.',
-    commitments: 'Vague — would look if team asked.',
-    followUps: 'Buyer but not user — need to reach his team.',
+    commitments: 'Vague, would look if team asked.',
+    followUps: 'Buyer but not user, need to reach his team.',
     createdAt: '2026-08-01T15:00:00.000Z',
   },
 ]
@@ -367,7 +367,7 @@ const decisions: Decision[] = [
     hypothesisId: 'hyp_frequent',
     decision: 'proceed_to_solution',
     evidenceBasis: 'Five of six participants who ship real creative volume described this recurring weekly, tied to a concrete cadence (30–50+ creatives/week). Frequency is well supported.',
-    remainingUncertainty: 'Frequency is not the same as urgency — being common does not mean it is worth paying to fix.',
+    remainingUncertainty: 'Frequency is not the same as urgency, being common does not mean it is worth paying to fix.',
     nextTest: 'Shift focus to the urgency hypothesis with the high-volume DTC segment.',
     wouldChangeMind: 'If new high-volume interviews reported this happening only occasionally.',
     createdAt: '2026-08-02T15:00:00.000Z',

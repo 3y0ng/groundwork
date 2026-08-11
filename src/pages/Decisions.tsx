@@ -58,7 +58,7 @@ function Item({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-wide text-ink-faint mb-0.5">{label}</p>
-      <p className="text-ink-soft">{value || '—'}</p>
+      <p className="text-ink-soft">{value || '-'}</p>
     </div>
   )
 }

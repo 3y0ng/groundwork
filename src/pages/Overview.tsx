@@ -140,7 +140,7 @@ export function Overview() {
 }
 
 // Recommends the single most useful next step for wherever the founder is in the
-// journey — so a brand-new project points at "create a hypothesis", not at
+// journey, so a brand-new project points at "create a hypothesis", not at
 // consolidation it has no data for.
 function computeNextAction(
   hypotheses: ReturnType<typeof useProjectData>['hypotheses'],
@@ -149,7 +149,7 @@ function computeNextAction(
   evidence: ReturnType<typeof useProjectData>['evidence'],
 ): { title: string; body: string; to: string; cta: string } {
   if (hypotheses.length === 0)
-    return { title: 'Define your first hypothesis', body: 'Break your problem into a specific, testable claim — and decide up front what would prove it wrong.', to: '/hypotheses', cta: 'Go to Hypotheses' }
+    return { title: 'Define your first hypothesis', body: 'Break your problem into a specific, testable claim, and decide up front what would prove it wrong.', to: '/hypotheses', cta: 'Go to Hypotheses' }
   if (segments.length === 0)
     return { title: 'Add a customer segment', body: 'Describe the group you think has this problem by observable traits, so you know who to interview.', to: '/segments', cta: 'Go to Customer Segments' }
   if (interviews.length === 0)
@@ -157,7 +157,7 @@ function computeNextAction(
   if (evidence.length === 0)
     return { title: 'Extract evidence from your interviews', body: 'Turn your notes into classified, quote-backed evidence and tie it to your hypotheses.', to: '/interviews', cta: 'Go to Interviews' }
 
-  // There is data — point at the hypothesis with the thinnest evidence.
+  // There is data, point at the hypothesis with the thinnest evidence.
   const ranked = hypotheses
     .map(h => ({ h, score: scoreEvidence(evidenceForHypothesis(h.id, evidence)) }))
     .sort((a, b) => rankStrength(a.score.strength) - rankStrength(b.score.strength))

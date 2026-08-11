@@ -31,7 +31,7 @@ export function EvidenceBoard() {
 
   return (
     <div>
-      <SectionHeading title="Evidence Board" sub="Every quote-backed piece of evidence in one place. Filter to see what supports and what contradicts — never just the encouraging half." />
+      <SectionHeading title="Evidence Board" sub="Every quote-backed piece of evidence in one place. Filter to see what supports and what contradicts, never just the encouraging half." />
 
       {evidence.length === 0 ? (
         <EmptyState title="No evidence yet" body="Open an interview and run “Extract evidence” to populate the board. Each card keeps the original quote separate from any interpretation." action={<Link to="/interviews" className="btn-primary">Go to interviews</Link>} />

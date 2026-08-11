@@ -70,11 +70,11 @@ export function HypothesisDetail() {
             <div className="grid sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-line">
               <div>
                 <p className="section-title mb-1">Evidence required</p>
-                <p className="text-sm text-ink-soft">{hypothesis.evidenceRequired || '—'}</p>
+                <p className="text-sm text-ink-soft">{hypothesis.evidenceRequired || '-'}</p>
               </div>
               <div>
                 <p className="section-title mb-1 text-contra-fg">Disconfirming evidence</p>
-                <p className="text-sm text-ink-soft">{hypothesis.disconfirming || '—'}</p>
+                <p className="text-sm text-ink-soft">{hypothesis.disconfirming || '-'}</p>
               </div>
             </div>
           </Card>
@@ -103,7 +103,7 @@ export function HypothesisDetail() {
                   </thead>
                   <tbody>
                     {linkedInterviews.map(i => {
-                      const segName = segments.find(s => s.id === i.segmentId)?.name ?? '—'
+                      const segName = segments.find(s => s.id === i.segmentId)?.name ?? '-'
                       const read = readInterview(i)
                       return (
                         <tr key={i.id} className="border-b border-line/60 align-top">
@@ -113,7 +113,7 @@ export function HypothesisDetail() {
                           </td>
                           <td className="py-2.5 pr-3 text-ink-soft">{segName}</td>
                           <td className="py-2.5 pr-3 max-w-[220px]">
-                            <span className="text-ink-soft line-clamp-2">{i.consequences || i.painPoints || '—'}</span>
+                            <span className="text-ink-soft line-clamp-2">{i.consequences || i.painPoints || '-'}</span>
                           </td>
                           <td className="py-2.5"><Chip tone={read.tone as any}>{read.label}</Chip></td>
                         </tr>
@@ -190,7 +190,7 @@ function ConsolidationView({ c, rec, onDecide }: { c: Consolidation; rec: Decisi
         <MiniList title="Unanswered questions" items={c.unansweredQuestions} />
       </div>
       <div className="text-sm text-ink-soft"><span className="font-semibold text-ink">Commitment strength:</span> {c.commitmentStrength}</div>
-      <p className="text-xs text-ink-faint">Based on {c.relevantConversations} conversation{c.relevantConversations === 1 ? '' : 's'} across {c.matchingSegments} segment{c.matchingSegments === 1 ? '' : 's'} — weighted by quality, not majority vote.</p>
+      <p className="text-xs text-ink-faint">Based on {c.relevantConversations} conversation{c.relevantConversations === 1 ? '' : 's'} across {c.matchingSegments} segment{c.matchingSegments === 1 ? '' : 's'}, weighted by quality, not majority vote.</p>
 
       {rec && (
         <div className="pt-4 border-t border-line">
@@ -202,7 +202,7 @@ function ConsolidationView({ c, rec, onDecide }: { c: Consolidation; rec: Decisi
           <p className="text-sm text-ink-soft mt-1"><span className="font-medium text-ink">Next test:</span> {rec.suggestedNextTest}</p>
           <div className="mt-3 flex items-center gap-3">
             <button className="btn-primary" onClick={onDecide}>Record a decision</button>
-            <span className="text-xs text-ink-faint">You own the final call — this is advice, not a verdict.</span>
+            <span className="text-xs text-ink-faint">You own the final call, this is advice, not a verdict.</span>
           </div>
         </div>
       )}
@@ -228,7 +228,7 @@ function MiniList({ title, items }: { title: string; items: string[] }) {
     <div>
       <p className="text-xs font-semibold text-ink-faint mb-1">{title}</p>
       <ul className="list-disc pl-4 space-y-0.5 text-ink-soft">
-        {items.length ? items.map((i, k) => <li key={k}>{i}</li>) : <li className="list-none text-ink-faint -ml-4">—</li>}
+        {items.length ? items.map((i, k) => <li key={k}>{i}</li>) : <li className="list-none text-ink-faint -ml-4">-</li>}
       </ul>
     </div>
   )
@@ -257,7 +257,7 @@ function DecisionModal({
             {DECISION_TYPES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
           </select>
         </Field>
-        <Field label="Evidence behind the decision" hint="Point to the specific behaviour, spend, or commitments — not a headcount."><textarea className="input min-h-[70px]" value={evidenceBasis} onChange={e => setEvidenceBasis(e.target.value)} /></Field>
+        <Field label="Evidence behind the decision" hint="Point to the specific behaviour, spend, or commitments, not a headcount."><textarea className="input min-h-[70px]" value={evidenceBasis} onChange={e => setEvidenceBasis(e.target.value)} /></Field>
         <div className="grid sm:grid-cols-2 gap-3">
           <Field label="Remaining uncertainty"><textarea className="input min-h-[70px]" value={remainingUncertainty} onChange={e => setRemainingUncertainty(e.target.value)} /></Field>
           <Field label="What you'll test next"><textarea className="input min-h-[70px]" value={nextTest} onChange={e => setNextTest(e.target.value)} /></Field>

@@ -214,7 +214,7 @@ export const useStore = create<State>()(
       resetDemo: () =>
         set({ ...seedBundle, evidence: [], templates: [], activeProjectId: seedBundle.projects[0]?.id ?? null }),
 
-      // Clear everything and start with one blank project — the true "brand-new
+      // Clear everything and start with one blank project, the true "brand-new
       // founder" state. Always leaves ≥1 project so page guards hold.
       startFresh: () => {
         const id = uid('proj')

@@ -61,7 +61,7 @@ export function ProjectSettings() {
     <div>
       <SectionHeading
         title="Project setup"
-        sub="Separate the problem from your proposed solution. A problem describes who hurts and why — not what you plan to build."
+        sub="Separate the problem from your proposed solution. A problem describes who hurts and why, not what you plan to build."
         action={
           <div className="flex gap-2">
             <button className="btn-outline" onClick={() => { const id = addProject({ name: 'New project', problemStatement: '', solutionIdea: '', industry: '', stage: 'Idea / pre-seed', decisionToMake: '', deadline: '', confidence: 'low' }); void id }}>+ New project</button>
@@ -87,7 +87,7 @@ export function ProjectSettings() {
                 : <Callout tone="good" title="Problem-shaped">{critique.reasoning}</Callout>
             )}
 
-            <Field label="Current solution idea (optional)" hint="Kept separate on purpose — you are validating the problem first.">
+            <Field label="Current solution idea (optional)" hint="Kept separate on purpose, you are validating the problem first.">
               <textarea className="input min-h-[60px]" value={project.solutionIdea ?? ''} onChange={e => set({ solutionIdea: e.target.value })} />
             </Field>
 

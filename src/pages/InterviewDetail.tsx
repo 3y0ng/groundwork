@@ -124,7 +124,7 @@ export function InterviewDetail() {
       ) : (
         <div className="space-y-4">
           {myEvidence.length === 0 && !feedback && (
-            <Callout tone="info" title="Run the analysis">Use <strong>Extract evidence</strong> to pull classified, quote-backed evidence from the notes, and <strong>Get feedback</strong> to score the interview quality. Nothing is invented — every quote comes straight from your notes.</Callout>
+            <Callout tone="info" title="Run the analysis">Use <strong>Extract evidence</strong> to pull classified, quote-backed evidence from the notes, and <strong>Get feedback</strong> to score the interview quality. Nothing is invented, every quote comes straight from your notes.</Callout>
           )}
 
           {feedback && <FeedbackPanel fb={feedback} />}
@@ -176,7 +176,7 @@ function FeedbackPanel({ fb }: { fb: InterviewFeedback }) {
           <p className="text-xs text-ink-faint">interview quality</p>
         </div>
         <div className="flex-1">
-          <p className="text-sm text-ink-soft">A score alone means little — the value is in the per-dimension feedback below and the follow-ups you missed.</p>
+          <p className="text-sm text-ink-soft">A score alone means little, the value is in the per-dimension feedback below and the follow-ups you missed.</p>
           {fb.talkRatio && (
             <div className="mt-3">
               <div className="flex justify-between text-xs mb-1"><span className="text-ink-soft">You {fb.talkRatio.interviewerPct}%</span><span className="text-ink-soft">Them {fb.talkRatio.customerPct}%</span></div>

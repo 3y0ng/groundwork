@@ -174,13 +174,13 @@ function NewInterviewModal({ projectId, onClose }: { projectId: string; onClose:
   }
 
   return (
-    <Modal open onClose={onClose} wide title="Log interview" sub="Capture fast now — structure and analysis come next.">
+    <Modal open onClose={onClose} wide title="Log interview" sub="Capture fast now, structure and analysis come next.">
       <div className="space-y-4">
         <div className="grid sm:grid-cols-3 gap-3">
           <Field label="Participant"><input className="input" value={participantName} onChange={e => setName(e.target.value)} /></Field>
           <Field label="Company"><input className="input" value={company} onChange={e => setCompany(e.target.value)} /></Field>
           <Field label="Role"><input className="input" value={role} onChange={e => setRole(e.target.value)} /></Field>
-          <Field label="Segment"><select className="input" value={segmentId} onChange={e => setSegmentId(e.target.value)}><option value="">—</option>{segments.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
+          <Field label="Segment"><select className="input" value={segmentId} onChange={e => setSegmentId(e.target.value)}><option value="">-</option>{segments.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></Field>
           <Field label="Date"><input type="date" className="input" value={date} onChange={e => setDate(e.target.value)} /></Field>
         </div>
         <Field label="Hypotheses tested">

@@ -7,7 +7,7 @@
 // scripts/ai-proxy.mjs) and set VITE_AI_PROVIDER=openai +
 // VITE_AI_PROXY_URL=http://localhost:8787. Every live call still validates
 // against the zod schemas below, and any failure falls back to the mock so the
-// UI never dead-ends. The proxy holds the model key — it never touches the
+// UI never dead-ends. The proxy holds the model key, it never touches the
 // client bundle.
 // ---------------------------------------------------------------------------
 
@@ -50,14 +50,14 @@ const ALT_MARKERS = ['spreadsheet', 'notion', 'we use', 'slack', 'airtable', 'in
 
 // Weak-question detection ---------------------------------------------------
 const WEAK_PATTERNS: { re: RegExp; problem: string }[] = [
-  { re: /would you (use|pay|want|buy)/i, problem: 'Hypothetical — asks about an imagined future action.' },
+  { re: /would you (use|pay|want|buy)/i, problem: 'Hypothetical, asks about an imagined future action.' },
   { re: /do you think/i, problem: 'Invites an opinion rather than a fact.' },
-  { re: /don'?t you (find|think|hate|agree)/i, problem: 'Leading — signals the answer you want.' },
+  { re: /don'?t you (find|think|hate|agree)/i, problem: 'Leading, signals the answer you want.' },
   { re: /is this a (good|great) idea/i, problem: 'Asks for a compliment, not evidence.' },
-  { re: /how much would you pay/i, problem: 'Hypothetical pricing — unreliable without a real transaction.' },
+  { re: /how much would you pay/i, problem: 'Hypothetical pricing, unreliable without a real transaction.' },
   { re: /would (an? )?ai/i, problem: 'Pitches a solution and asks for a hypothetical.' },
   { re: /(like|love) (the|this|my) (idea|product|app|tool)/i, problem: 'Fishing for approval of your idea.' },
-  { re: /would it help/i, problem: 'Hypothetical — people over-predict that things will help.' },
+  { re: /would it help/i, problem: 'Hypothetical, people over-predict that things will help.' },
 ]
 
 const STRONG_ALTERNATIVES = [
@@ -72,7 +72,7 @@ const STRONG_ALTERNATIVES = [
 // ---------------------------------------------------------------------------
 // Live-provider seam. POSTs { prompt, schema } to the proxy named by
 // VITE_AI_PROXY_URL and returns the parsed JSON object. The model key lives on
-// the proxy only. `schema` is the schema name — the proxy can use it to enforce
+// the proxy only. `schema` is the schema name, the proxy can use it to enforce
 // structured output; a strict server (Option A) would look it up server-side.
 // ---------------------------------------------------------------------------
 async function callLLM(prompt: string, schema: string): Promise<unknown> {
@@ -125,7 +125,7 @@ export const ai = {
       reasoning: looksLikeSolution
         ? 'This reads as a product or feature ("what to build") rather than a customer problem ("what hurts and why"). It names a solution shape but not the group, the situation, or the consequence.'
         : hasConsequence
-        ? 'This describes a group and a consequence rather than jumping to a product. Good foundation — make sure the consequence is something you can observe in past behaviour.'
+        ? 'This describes a group and a consequence rather than jumping to a product. Good foundation, make sure the consequence is something you can observe in past behaviour.'
         : 'This is problem-shaped but thin. Add who experiences it, in what situation, and what it costs them, so it becomes observable.',
       suggestedRewrite: looksLikeSolution
         ? 'A specific group struggles to <do a real job> when <situation>, causing <observable consequence such as wasted time, money, or repeated mistakes>.'
@@ -139,9 +139,9 @@ export const ai = {
       catch (e) { warnFallback('rewriteHypothesis', e) }
     }
     const issues: string[] = []
-    if (!has(belief, ['when', 'during', 'after', 'while'])) issues.push('No context — add when the problem occurs.')
-    if (!has(belief, ['causing', 'so', 'which means', 'leading', 'costs', 'waste'])) issues.push('No consequence — add what it costs them.')
-    if (belief.length < 40) issues.push('Too vague — name the specific segment and situation.')
+    if (!has(belief, ['when', 'during', 'after', 'while'])) issues.push('No context, add when the problem occurs.')
+    if (!has(belief, ['causing', 'so', 'which means', 'leading', 'costs', 'waste'])) issues.push('No consequence, add what it costs them.')
+    if (belief.length < 40) issues.push('Too vague, name the specific segment and situation.')
     if (has(belief, ['everyone', 'people', 'businesses', 'companies'])) issues.push('Segment is too broad to be observable.')
     return think({
       isTestable: issues.length === 0,
@@ -269,13 +269,13 @@ function classifySentence(s: string): EvidenceExtraction['items'][number] | null
   } else if (has(low, HYPOTHETICAL_MARKERS)) {
     kind = 'hypothetical'; direction = 'unclear'; interp = 'A prediction about future behaviour. People over-predict; weight lightly.'
   } else if (has(low, COMMIT_MARKERS)) {
-    kind = 'new_commitment'; direction = 'supports'; interp = 'A concrete next step — strong signal of real interest.'
+    kind = 'new_commitment'; direction = 'supports'; interp = 'A concrete next step, strong signal of real interest.'
     tags.push('commitment')
   } else if (has(low, SPEND_MARKERS)) {
     kind = 'existing_commitment'; direction = 'supports'; interp = 'Existing spend is one of the strongest forms of evidence.'
   } else if (has(low, PAST_MARKERS)) {
     kind = 'observed_past_behaviour'; direction = has(low, CONSEQUENCE_MARKERS) ? 'supports' : 'unclear'
-    interp = 'Describes something they actually did — high-quality evidence.'
+    interp = 'Describes something they actually did, high-quality evidence.'
   } else if (has(low, CURRENT_MARKERS)) {
     kind = 'current_behaviour'; direction = 'supports'; interp = 'How they handle it today; reveals the real workflow.'
   } else if (has(low, ['not really', "doesn't", 'no big deal', "wouldn't", 'never had', 'not a problem', 'fine as is', "don't need"])) {
@@ -302,7 +302,7 @@ function buildFeedback(notes: string, transcript?: string): InterviewFeedback {
   })
 
   const dimensions = [
-    dim('past', 'Asked about past behaviour', has(t, PAST_MARKERS), 'The participant recounted specific past events.', 'The talk stayed general — no concrete "last time" story surfaced.', 'Tell me about the last time this happened.'),
+    dim('past', 'Asked about past behaviour', has(t, PAST_MARKERS), 'The participant recounted specific past events.', 'The talk stayed general, no concrete "last time" story surfaced.', 'Tell me about the last time this happened.'),
     dim('examples', 'Asked for specific examples', has(t, ['for example', 'last time', 'specifically', 'walk me through']), 'Concrete examples anchored the discussion.', 'Answers stayed abstract.', 'Can you give me a specific recent example?'),
     dim('workflow', 'Explored the current workflow', has(t, CURRENT_MARKERS.concat(ALT_MARKERS)), 'You mapped how they handle it today.', 'The current workflow was left unexplored.', 'Walk me through exactly what you do today, step by step.'),
     dim('consequences', 'Investigated consequences', has(t, CONSEQUENCE_MARKERS), 'You uncovered the cost of the problem.', 'You never learned what happens if this goes unsolved.', 'What happens when you leave it unresolved?'),
@@ -310,7 +310,7 @@ function buildFeedback(notes: string, transcript?: string): InterviewFeedback {
     dim('solutions', 'Investigated existing solutions', has(t, ALT_MARKERS), 'Existing alternatives were surfaced.', 'You did not learn what they use today.', 'What are you using to handle this now?'),
     dim('spend', 'Investigated spending / resources', has(t, SPEND_MARKERS), 'You probed real spend.', 'Money and resource cost were not explored.', 'What does the current approach cost you?'),
     dim('leading', 'Avoided leading questions', !WEAK_PATTERNS.some(p => p.re.test(t)), 'Questions stayed neutral.', 'Some questions signalled the answer you wanted.', 'Rephrase to ask what they did, not what they think of your idea.'),
-    dim('pitch', 'Avoided pitching', !has(t, ['our product', 'we built a', 'our tool', 'we are building', 'let me show you']), 'You held back the pitch and kept listening.', 'You pitched, which biases everything said afterwards.', 'Save the pitch — ask another question about their experience instead.'),
+    dim('pitch', 'Avoided pitching', !has(t, ['our product', 'we built a', 'our tool', 'we are building', 'let me show you']), 'You held back the pitch and kept listening.', 'You pitched, which biases everything said afterwards.', 'Save the pitch, ask another question about their experience instead.'),
     dim('hypothetical', 'Avoided hypothetical questions', !has(t, ['would you', 'do you think you would']), 'You stayed on real events.', 'Hypotheticals crept in.', 'Swap "would you" for "when did you last".'),
     dim('listen', 'Let the participant speak', (transcript ? true : has(t, ['they said', 'participant', 'she said', 'he said', '"'])), 'The participant did most of the talking.', 'The balance leaned toward the interviewer.', 'Ask, then stay silent and let them fill the space.'),
     dim('nextstep', 'Reached a clear next step', has(t, COMMIT_MARKERS.concat(['follow up', 'intro', 'next week'])), 'You secured a concrete next step.', 'The conversation ended without a next step.', 'Who else should I talk to about this?'),
@@ -327,7 +327,7 @@ function buildFeedback(notes: string, transcript?: string): InterviewFeedback {
     talkRatio = {
       interviewerPct,
       customerPct: 100 - interviewerPct,
-      note: interviewerPct > 45 ? 'You spoke more than a third of the time — aim to talk less and listen more.' : 'Healthy balance: the participant did most of the talking.',
+      note: interviewerPct > 45 ? 'You spoke more than a third of the time, aim to talk less and listen more.' : 'Healthy balance: the participant did most of the talking.',
     }
   }
 
@@ -349,9 +349,9 @@ function buildFeedback(notes: string, transcript?: string): InterviewFeedback {
     missedFollowUps: missedFollowUps.slice(0, 4),
     summary: {
       strongestEvidence: has(notes, SPEND_MARKERS) ? 'The participant already spends money in this area, which is hard evidence of felt need.' : has(notes, PAST_MARKERS) ? 'A concrete account of past behaviour rather than opinion.' : 'Some real workflow detail surfaced.',
-      weakestEvidence: `Little signal on "${weakest.label.toLowerCase()}" — ${weakest.betterQuestion ?? 'probe this next time.'}`,
+      weakestEvidence: `Little signal on "${weakest.label.toLowerCase()}", ${weakest.betterQuestion ?? 'probe this next time.'}`,
       surprisingInsight: has(notes, ALT_MARKERS) ? 'They have already improvised a workaround, suggesting the problem is real enough to solve themselves.' : 'Watch for whether this pain is felt strongly enough to act on.',
-      contradiction: has(notes, ['not really', 'no big deal', 'not a problem', 'fine as is']) ? 'They downplayed the severity at one point — flag this against any enthusiasm elsewhere.' : 'No direct contradiction detected, but absence of consequence talk is itself a caution.',
+      contradiction: has(notes, ['not really', 'no big deal', 'not a problem', 'fine as is']) ? 'They downplayed the severity at one point, flag this against any enthusiasm elsewhere.' : 'No direct contradiction detected, but absence of consequence talk is itself a caution.',
       openQuestion: 'Is the consequence severe and frequent enough to change their behaviour or spend?',
       recommendedNextQuestion: weakest.betterQuestion ?? 'What would have to be true for you to change how you handle this?',
       hypothesesAffected: [],
@@ -429,7 +429,7 @@ function buildConsolidation(rows: { label: string; text: string }[]): Consolidat
     commonConsequences: [],
     existingAlternatives: [],
     existingSpending: supporting.filter(s => has(s.toLowerCase(), SPEND_MARKERS)).slice(0, 3),
-    commitmentStrength: rows.some(r => has(r.text.toLowerCase(), COMMIT_MARKERS)) ? 'At least one concrete commitment observed.' : 'No concrete commitments yet — interest remains verbal.',
+    commitmentStrength: rows.some(r => has(r.text.toLowerCase(), COMMIT_MARKERS)) ? 'At least one concrete commitment observed.' : 'No concrete commitments yet, interest remains verbal.',
     unansweredQuestions: [
       consequenceCount < Math.ceil(n / 2) ? 'Is the consequence of not solving this actually severe?' : 'What is the fully-loaded cost of the status quo?',
       spendCount === 0 ? 'Would anyone pay, or reallocate budget, to solve this?' : 'Who controls the budget for this?',

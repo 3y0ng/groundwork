@@ -8,7 +8,7 @@ export const uid = (prefix = 'id'): string =>
 export const nowISO = () => new Date().toISOString()
 
 export const formatDate = (iso?: string) => {
-  if (!iso) return '—'
+  if (!iso) return '-'
   const d = new Date(iso)
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }

@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <div className="w-11 h-11 rounded-xl bg-contra-bg text-contra-fg grid place-items-center mx-auto mb-3 text-xl">!</div>
           <h1 className="font-semibold text-ink">Something went wrong</h1>
           <p className="text-sm text-ink-soft mt-1">
-            The app hit an unexpected error. Your saved work is stored locally and is usually fine —
+            The app hit an unexpected error. Your saved work is stored locally and is usually fine, 
             reloading normally fixes it.
           </p>
           <pre className="text-[11px] text-ink-faint bg-black/[0.03] border border-line rounded-lg p-2 mt-3 text-left overflow-x-auto">

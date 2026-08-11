@@ -20,7 +20,7 @@
 //   AI_MODEL      model id               (default: gpt-4.1-mini / claude cheap)
 //   OPENAI_API_KEY / ANTHROPIC_API_KEY   your key (only the chosen one needed)
 //   PORT          listen port            (default: 8787)
-//   ALLOW_ORIGIN  CORS origin            (default: * — fine for local dev)
+//   ALLOW_ORIGIN  CORS origin            (default: *, fine for local dev)
 // ---------------------------------------------------------------------------
 
 import http from 'node:http'

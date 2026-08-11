@@ -10,7 +10,7 @@ describe('mock engine is active in tests', () => {
   })
 })
 
-describe('critiqueProblem — separates problem from solution', () => {
+describe('critiqueProblem, separates problem from solution', () => {
   it('flags a solution-shaped statement', async () => {
     const r = await ai.critiqueProblem('Small businesses need an AI analytics dashboard.')
     expect(r.looksLikeSolution).toBe(true)
@@ -25,7 +25,7 @@ describe('critiqueProblem — separates problem from solution', () => {
   })
 })
 
-describe('reviewQuestion — catches weak questions', () => {
+describe('reviewQuestion, catches weak questions', () => {
   it('flags a hypothetical', async () => {
     const r = await ai.reviewQuestion('Would you use this?')
     expect(r.verdict).toBe('weak')
@@ -41,7 +41,7 @@ describe('reviewQuestion — catches weak questions', () => {
   })
 })
 
-describe('extractEvidence — classifies, never invents', () => {
+describe('extractEvidence, classifies, never invents', () => {
   it('labels spend as strong evidence and compliments as compliments', async () => {
     const { items } = await ai.extractEvidence(
       'We currently pay $400 a month for a tool to handle this. Honestly this is a great idea.',
@@ -55,7 +55,7 @@ describe('extractEvidence — classifies, never invents', () => {
   })
 })
 
-describe('consolidate — reasons, not majority vote', () => {
+describe('consolidate, reasons, not majority vote', () => {
   it('concludes "contradicted" when participants dismiss the problem', async () => {
     const rows = [
       { label: 'A', text: 'not really a big deal, the spreadsheet is fine as is' },

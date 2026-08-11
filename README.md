@@ -41,7 +41,7 @@ ideas, expressed in the product's own guidance:
    your problem statement is secretly a product pitch and asks you to rewrite it
    as a customer problem with a consequence.
 
-4. **Decide what would prove you wrong — first.** Each hypothesis requires
+4. **Decide what would prove you wrong, first.** Each hypothesis requires
    *disconfirming evidence* before you interview, which is the main defence
    against confirmation bias.
 
@@ -55,7 +55,7 @@ ideas, expressed in the product's own guidance:
 
 7. **Frequency ≠ urgency ≠ willingness to pay.** These are distinct
    hypotheses. The demo deliberately shows a problem that is clearly *frequent*
-   but whose *urgency* is unproven — so the dashboard's recommended action is to
+   but whose *urgency* is unproven, so the dashboard's recommended action is to
    go test consequence, not to celebrate.
 
 ---
@@ -74,7 +74,7 @@ Overview → **Hypotheses** → **Customer Segments** → **Interviews** →
 7. Get per-dimension interview-quality feedback, talk ratio, and missed
    follow-ups.
 8. Consolidate evidence across interviews into a reasoned conclusion.
-9. Record a decision — continue, narrow, refine, proceed, pause, reject, pivot —
+9. Record a decision, continue, narrow, refine, proceed, pause, reject, pivot, 
    with the evidence behind it and what would change your mind.
 
 ---
@@ -100,13 +100,13 @@ npm install
 npm run dev          # http://localhost:5173
 ```
 
-That's it — the demo project "Creative Memory" loads with mixed sample
+That's it, the demo project "Creative Memory" loads with mixed sample
 interviews, powered by the keyless mock AI engine. `npm run build` produces a
 production bundle; `npm run lint` type-checks.
 
 Your work is saved in the browser. On the **Project setup** page you can
 **Export** a project to a JSON file (backup / move to another machine) and
-**Import** it back — handy since there are no accounts.
+**Import** it back, handy since there are no accounts.
 
 ### Optional: turn on real AI (bring your own key)
 
@@ -128,7 +128,7 @@ falls back to the mock so the UI never breaks. The sidebar footer shows the
 active provider.
 
 > Deploying this as a **public** tool on your own key? Don't expose the proxy
-> unprotected — add rate limiting, a bot check, and a spend cap first. The local
+> unprotected, add rate limiting, a bot check, and a spend cap first. The local
 > proxy here is meant for personal / development use.
 
 ### Optional: connect Supabase
@@ -143,7 +143,7 @@ The sidebar footer shows whether the database is `Local (browser)` or
 `Supabase`.
 
 Because every AI call goes through the `ai` facade (`src/ai/engine.ts`) and the
-`callLLM()` proxy seam, the mock and a live model are interchangeable — nothing
+`callLLM()` proxy seam, the mock and a live model are interchangeable. Nothing
 else in the app changes.
 
 ---
@@ -191,7 +191,7 @@ logistics.
 
 ## AI safety rules (enforced in prompts and honoured by the mock)
 
-- Never fabricate a customer quote — quotes are verbatim from the notes.
+- Never fabricate a customer quote, quotes are verbatim from the notes.
 - Never present weak evidence as fact; preserve uncertainty.
 - Never treat compliments as validation or interview count as evidence quality.
 - Always explain reasoning and point back to the source text.
@@ -199,5 +199,5 @@ logistics.
 
 ---
 
-Built by [Pyreel](https://pyreel.com) — AI ad-creative and performance tooling
+Built by [Pyreel](https://pyreel.com), AI ad-creative and performance tooling
 for founders and growth teams. Released under the MIT License.

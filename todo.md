@@ -14,8 +14,24 @@ Last updated: 2026-08-08
 - [x] Data **export / import** (per-project JSON) in the store + Project setup
       page. Verified: full id-remap round trip, no reference leakage.
 - [x] `.env.example`, README (three tiers), and an MIT `LICENSE`.
-- [ ] **Publish to GitHub** — gated on the user's explicit go (repo name +
-      public/private). Not done yet.
+- [x] **Published to GitHub** (public): https://github.com/3y0ng/groundwork
+- [x] In-app onboarding: first-run welcome walkthrough + "Enable real AI" setup
+      guide (env-file steps, copyable block); SETUP.md; Pyreel attribution.
+- [x] Real new-user flow: "Start my own project" path + `startFresh()`, dynamic
+      Overview recommendation, blank-project handling.
+- [x] **Error boundary** — friendly recovery screen (reload / reset) so an
+      unexpected throw never blanks the page. Verified live.
+- [x] **Tests** — vitest suite for the evidence-scoring + mock-AI logic
+      (16 tests: weighting, weak-question detection, extraction, consolidation).
+      `npm test`.
+
+Still worth doing (not blocking):
+- [ ] One real-key AI smoke test (needs your OpenAI key — verifies a full live
+      call returns schema-valid JSON; mock fallback exists either way).
+- [ ] README screenshots / GIF for the public repo.
+- [ ] v1 feature gaps: inline highlight-to-tag, manual add-evidence form,
+      interview-template management UI, cross-project evidence board, export to PDF.
+- [ ] Mobile layout, accessibility pass, bundle code-splitting (~560 kB).
 
 ---
 

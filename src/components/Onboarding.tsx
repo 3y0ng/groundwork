@@ -19,7 +19,7 @@ const STEPS = [
   { n: 4, title: 'Consolidate and decide', body: 'Weigh evidence by quality, then choose: continue, narrow, pivot, or proceed.' },
 ]
 
-export function WelcomeModal({ onClose, onStartFresh }: { onClose: () => void; onStartFresh: () => void }) {
+export function WelcomeModal({ onClose, onStartFresh, onOpenSetup }: { onClose: () => void; onStartFresh: () => void; onOpenSetup: () => void }) {
   return (
     <Modal open onClose={onClose} title="Welcome to Groundwork" sub="Turn a hunch into evidence you can trust. The path:">
       <div className="space-y-5">
@@ -40,7 +40,11 @@ export function WelcomeModal({ onClose, onStartFresh }: { onClose: () => void; o
           <button className="btn-primary flex-1" onClick={onStartFresh}>Start my own project</button>
         </div>
         <p className="text-xs text-ink-faint text-center">
-          Runs on a free demo AI. Add your own key anytime from Setup.
+          Runs on a free demo AI.{' '}
+          <button
+            onClick={onOpenSetup}
+            className="text-brand-600 hover:underline font-medium"
+          >Add your own API key →</button>
         </p>
       </div>
     </Modal>

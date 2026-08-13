@@ -19,7 +19,7 @@ export default function App() {
   const [welcome, setWelcome] = useState(() => {
     try { return !localStorage.getItem(WELCOME_KEY) } catch { return false }
   })
-  const { setupOpen, closeSetup } = useUI()
+  const { setupOpen, openSetup, closeSetup } = useUI()
   const startFresh = useStore(s => s.startFresh)
   const navigate = useNavigate()
 
@@ -32,6 +32,11 @@ export default function App() {
     startFresh()
     dismissWelcome()
     navigate('/settings')
+  }
+
+  const handleOpenSetup = () => {
+    dismissWelcome()
+    openSetup()
   }
 
   return (
@@ -54,7 +59,7 @@ export default function App() {
         </div>
       </main>
 
-      {welcome && <WelcomeModal onClose={dismissWelcome} onStartFresh={handleStartFresh} />}
+      {welcome && <WelcomeModal onClose={dismissWelcome} onStartFresh={handleStartFresh} onOpenSetup={handleOpenSetup} />}
       <SetupGuide open={setupOpen} onClose={closeSetup} />
     </div>
   )

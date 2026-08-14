@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Application store. Persists to localStorage so the demo survives refreshes.
+// Application store. Persists to localStorage so your work survives refreshes.
 // When Supabase is configured this is the layer you would swap for queries;
 // the shapes already match /supabase/schema.sql.
 // ---------------------------------------------------------------------------
@@ -83,13 +83,27 @@ interface State {
   startFresh: () => string
 }
 
+// One empty project: the "brand-new founder" starting state. This is the
+// default the app boots into, so the demo never auto-loads, it appears only
+// when explicitly requested (welcome modal's "Explore the demo" or the
+// "Reset to demo" button in Project setup). Shared with startFresh().
+function blankBundle() {
+  const id = uid('proj')
+  const project: Project = {
+    id, name: '', problemStatement: '', solutionIdea: '', industry: '',
+    stage: 'Idea / pre-seed', decisionToMake: '', deadline: '', confidence: 'low',
+    createdAt: nowISO(),
+  }
+  return {
+    projects: [project], hypotheses: [], segments: [], interviews: [],
+    evidence: [], decisions: [], insights: [], templates: [], activeProjectId: id,
+  }
+}
+
 export const useStore = create<State>()(
   persist(
     (set, get) => ({
-      ...seedBundle,
-      evidence: [],
-      templates: [],
-      activeProjectId: seedBundle.projects[0]?.id ?? null,
+      ...blankBundle(),
 
       addProject: p => {
         const id = uid('proj')
@@ -217,17 +231,9 @@ export const useStore = create<State>()(
       // Clear everything and start with one blank project, the true "brand-new
       // founder" state. Always leaves ≥1 project so page guards hold.
       startFresh: () => {
-        const id = uid('proj')
-        const project: Project = {
-          id, name: '', problemStatement: '', solutionIdea: '', industry: '',
-          stage: 'Idea / pre-seed', decisionToMake: '', deadline: '', confidence: 'low',
-          createdAt: nowISO(),
-        }
-        set({
-          projects: [project], hypotheses: [], segments: [], interviews: [],
-          evidence: [], decisions: [], insights: [], templates: [], activeProjectId: id,
-        })
-        return id
+        const bundle = blankBundle()
+        set(bundle)
+        return bundle.activeProjectId
       },
     }),
     {

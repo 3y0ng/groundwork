@@ -19,7 +19,7 @@ const STEPS = [
   { n: 4, title: 'Consolidate and decide', body: 'Weigh evidence by quality, then choose: continue, narrow, pivot, or proceed.' },
 ]
 
-export function WelcomeModal({ onClose, onStartFresh, onOpenSetup }: { onClose: () => void; onStartFresh: () => void; onOpenSetup: () => void }) {
+export function WelcomeModal({ onClose, onStartFresh, onOpenSetup, onExploreDemo }: { onClose: () => void; onStartFresh: () => void; onOpenSetup: () => void; onExploreDemo: () => void }) {
   return (
     <Modal open onClose={onClose} title="Welcome to Groundwork" sub="Turn a hunch into evidence you can trust. The path:">
       <div className="space-y-5">
@@ -36,7 +36,7 @@ export function WelcomeModal({ onClose, onStartFresh, onOpenSetup }: { onClose: 
         </ol>
 
         <div className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-line">
-          <button className="btn-outline flex-1" onClick={onClose}>Explore the demo</button>
+          <button className="btn-outline flex-1" onClick={onExploreDemo}>Explore the demo</button>
           <button className="btn-primary flex-1" onClick={onStartFresh}>Start my own project</button>
         </div>
         <p className="text-xs text-ink-faint text-center">

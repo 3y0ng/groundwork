@@ -38,10 +38,7 @@ export function Overview() {
     <div>
       <SectionHeading
         title={project.name || 'Untitled project'}
-        sub={project.problemStatement || 'Add a one-sentence problem statement in Project setup to frame what you are testing.'}
-        action={
-          <Link to="/settings" className="btn-outline">Project setup</Link>
-        }
+        sub={project.problemStatement || 'Add a one-sentence problem statement in Project settings to frame what you are testing.'}
       />
 
       {/* The dashboard should answer real questions, not show vanity metrics */}

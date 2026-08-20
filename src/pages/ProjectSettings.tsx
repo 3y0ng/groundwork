@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, SectionHeading, Field, Callout } from '@/components/ui'
 import { ConfidenceIndicator } from '@/components/widgets'
@@ -24,8 +24,40 @@ export function ProjectSettings() {
   const [importMsg, setImportMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  if (!project) return null
-  const set = (patch: Partial<typeof project>) => updateProject(project.id, patch)
+  // Editable draft. Changes stay local until "Save" commits them to the store,
+  // so this reads like a settings form rather than saving on every keystroke.
+  const [draft, setDraft] = useState(project)
+  const [justSaved, setJustSaved] = useState(false)
+
+  // Re-sync the draft when the active project changes (e.g. switched in the
+  // sidebar) so edits always reflect the project currently in view.
+  useEffect(() => {
+    setDraft(project)
+    setCritique(null)
+    setJustSaved(false)
+  }, [project?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!project || !draft) return null
+
+  const set = (patch: Partial<typeof draft>) => {
+    setDraft(d => (d ? { ...d, ...patch } : d))
+    setJustSaved(false)
+  }
+  const dirty = JSON.stringify(draft) !== JSON.stringify(project)
+
+  function handleSave() {
+    if (!project || !draft) return
+    updateProject(project.id, draft)
+    setJustSaved(true)
+  }
+
+  // Create a blank project and drop the user straight into the empty form to
+  // fill it out (same destination as first-run onboarding).
+  function handleNewProject() {
+    addProject({ name: '', problemStatement: '', solutionIdea: '', industry: '', stage: 'Idea / pre-seed', decisionToMake: '', deadline: '', confidence: 'low' })
+    navigate('/settings')
+    window.scrollTo({ top: 0 })
+  }
 
   function handleExport() {
     const bundle = exportProject(project!.id)
@@ -53,18 +85,21 @@ export function ProjectSettings() {
 
   async function checkProblem() {
     setBusy(true)
-    setCritique(await ai.critiqueProblem(project!.problemStatement))
+    setCritique(await ai.critiqueProblem(draft!.problemStatement))
     setBusy(false)
   }
 
   return (
     <div>
       <SectionHeading
-        title="Project setup"
+        title="Project settings"
         sub="Separate the problem from your proposed solution. A problem describes who hurts and why, not what you plan to build."
         action={
-          <div className="flex gap-2">
-            <button className="btn-outline" onClick={() => { const id = addProject({ name: 'New project', problemStatement: '', solutionIdea: '', industry: '', stage: 'Idea / pre-seed', decisionToMake: '', deadline: '', confidence: 'low' }); void id }}>+ New project</button>
+          <div className="flex items-center gap-2">
+            {dirty && <span className="text-xs text-ink-faint">Unsaved changes</span>}
+            {!dirty && justSaved && <span className="text-xs text-support-fg">Saved</span>}
+            <button className="btn-outline" onClick={handleNewProject}>+ New project</button>
+            <button className="btn-primary" onClick={handleSave} disabled={!dirty}>Save changes</button>
           </div>
         }
       />
@@ -72,10 +107,10 @@ export function ProjectSettings() {
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
           <Card className="p-5 space-y-4">
-            <Field label="Startup / project name"><input className="input" value={project.name} onChange={e => set({ name: e.target.value })} /></Field>
+            <Field label="Startup / project name"><input className="input" value={draft.name} onChange={e => set({ name: e.target.value })} /></Field>
 
             <Field label="Problem statement" hint="Who experiences it, in what situation, and what does it cost them?">
-              <textarea className="input min-h-[80px]" value={project.problemStatement} onChange={e => { set({ problemStatement: e.target.value }); setCritique(null) }} />
+              <textarea className="input min-h-[80px]" value={draft.problemStatement} onChange={e => { set({ problemStatement: e.target.value }); setCritique(null) }} />
             </Field>
             <button className="btn-outline" onClick={checkProblem} disabled={busy}>{busy ? 'Checking…' : 'Check problem statement'}</button>
             {critique && (
@@ -88,24 +123,24 @@ export function ProjectSettings() {
             )}
 
             <Field label="Current solution idea (optional)" hint="Kept separate on purpose, you are validating the problem first.">
-              <textarea className="input min-h-[60px]" value={project.solutionIdea ?? ''} onChange={e => set({ solutionIdea: e.target.value })} />
+              <textarea className="input min-h-[60px]" value={draft.solutionIdea ?? ''} onChange={e => set({ solutionIdea: e.target.value })} />
             </Field>
 
             <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Industry"><input className="input" value={project.industry} onChange={e => set({ industry: e.target.value })} /></Field>
-              <Field label="Startup stage"><input className="input" value={project.stage} onChange={e => set({ stage: e.target.value })} /></Field>
+              <Field label="Industry"><input className="input" value={draft.industry} onChange={e => set({ industry: e.target.value })} /></Field>
+              <Field label="Startup stage"><input className="input" value={draft.stage} onChange={e => set({ stage: e.target.value })} /></Field>
             </div>
 
-            <Field label="What decision are you trying to make?"><textarea className="input min-h-[56px]" value={project.decisionToMake} onChange={e => set({ decisionToMake: e.target.value })} /></Field>
+            <Field label="What decision are you trying to make?"><textarea className="input min-h-[56px]" value={draft.decisionToMake} onChange={e => set({ decisionToMake: e.target.value })} /></Field>
 
             <div className="grid sm:grid-cols-2 gap-3">
-              <Field label="Validation deadline"><input type="date" className="input" value={project.deadline ?? ''} onChange={e => set({ deadline: e.target.value })} /></Field>
+              <Field label="Validation deadline"><input type="date" className="input" value={draft.deadline ?? ''} onChange={e => set({ deadline: e.target.value })} /></Field>
               <Field label="Current confidence">
-                <select className="input" value={project.confidence} onChange={e => set({ confidence: e.target.value as Confidence })}>
+                <select className="input" value={draft.confidence} onChange={e => set({ confidence: e.target.value as Confidence })}>
                   <option value="very_low">Very low</option><option value="low">Low</option>
                   <option value="medium">Medium</option><option value="high">High</option><option value="very_high">Very high</option>
                 </select>
-                <div className="mt-2"><ConfidenceIndicator confidence={project.confidence} /></div>
+                <div className="mt-2"><ConfidenceIndicator confidence={draft.confidence} /></div>
               </Field>
             </div>
           </Card>

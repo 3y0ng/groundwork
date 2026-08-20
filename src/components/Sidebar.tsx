@@ -63,6 +63,22 @@ export function Sidebar() {
         ))}
       </nav>
 
+      {/* Project setup pinned at the bottom of the nav, above the status footer */}
+      <div className="px-3 pb-2">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors',
+              isActive ? 'bg-brand-50 text-brand-700 font-medium' : 'text-ink-soft hover:bg-black/[0.03]',
+            )
+          }
+        >
+          <span className="w-4 text-center text-ink-faint">⚙</span>
+          Project settings
+        </NavLink>
+      </div>
+
       <div className="px-4 py-3 border-t border-line space-y-1.5">
         <button
           onClick={openSetup}

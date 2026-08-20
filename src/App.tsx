@@ -21,6 +21,7 @@ export default function App() {
   })
   const { setupOpen, openSetup, closeSetup } = useUI()
   const startFresh = useStore(s => s.startFresh)
+  const resetDemo = useStore(s => s.resetDemo)
   const navigate = useNavigate()
 
   const dismissWelcome = () => {
@@ -34,8 +35,15 @@ export default function App() {
     navigate('/settings')
   }
 
+  const handleExploreDemo = () => {
+    resetDemo()
+    dismissWelcome()
+    navigate('/')
+  }
+
   const handleOpenSetup = () => {
     dismissWelcome()
+    navigate('/settings')
     openSetup()
   }
 
@@ -59,7 +67,7 @@ export default function App() {
         </div>
       </main>
 
-      {welcome && <WelcomeModal onClose={dismissWelcome} onStartFresh={handleStartFresh} onOpenSetup={handleOpenSetup} />}
+      {welcome && <WelcomeModal onClose={handleStartFresh} onStartFresh={handleStartFresh} onOpenSetup={handleOpenSetup} onExploreDemo={handleExploreDemo} />}
       <SetupGuide open={setupOpen} onClose={closeSetup} />
     </div>
   )
